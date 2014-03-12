@@ -41,6 +41,7 @@ class SparkFile {
   }
 
   property get Writer() : Writer {
+    var x = ""
     return _THREAD_INFO.get().Writer
   }
 

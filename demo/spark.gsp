@@ -1,18 +1,39 @@
 // classpath "org.gosu-lang.gosu:sparkgs:0.10"
-// extends sparkgs.SparkFile
+extends sparkgs.SparkFile
 
-get("/", \-> test.render(Writer) )
+uses view.*
+uses view.layout.*
 
-get("/foo", \-> "Foo!" )
+// Set layout
+Layout = new AppLayoutTmp() // Should be AppLayout
 
-get("/bar", \-> "Barrr!" )
+// Set location of static files
+//StaticFiles = "/public"
 
-get("/doh", \-> "It's a miracle!" )
+get("/", \-> Sample.render(Writer) )
 
-get("/bbb", \-> "It's a miracle! ${Params['asdf']}" )
+get("/foo", "Foo!" )
 
-get("/square/:int", \-> ({1, 2, 3} as String) )
+get("/bar", "Bar!" )
 
-get("/test/:foo", \-> Params[':foo'] )
+get("/square/:int", \-> Params['int'] * Params['int'] )
 
 post("/post_to", \-> Params['foo'] )
+
+get("/example/:bar", MyController#foo())
+
+handle("/asdf", with(\-> "Foo", {
+          get("/bar", \-> "Bar"
+  })
+
+rpc("/foo", MyRpcController)
+
+restful("/contacts", ContactsController)
+//  GET /contacts   -> ContactsController#index()
+//  POST /contacts   -> ContactsController#create()
+//  GET /contacts/:id -> ContactsController#show(id:String)
+
+<a href="<%= urlFor(ContactsController#show(myContact.Id)) %>">Go To It</a>
+
+
+  GET /asdf/bar

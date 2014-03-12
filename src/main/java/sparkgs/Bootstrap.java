@@ -52,8 +52,8 @@ public class Bootstrap {
         Gosu.init();
       }
       String content = new String(StreamUtil.getContent(url.openStream()));
-      Spark.before(new ReloadFilter(url, content));
       evalSparkfile(content);
+      Spark.before(new ReloadFilter(url, content));
     } catch (Exception e) {
       throw GosuExceptionUtil.forceThrow(e);
     }
@@ -91,8 +91,8 @@ public class Bootstrap {
           System.out.println("Sparkfile changed, reloading routes!");
           TypeSystem.refresh(true);
           RouteMatcherFactory.get().clearRoutes();
-          Spark.before(new ReloadFilter(_url, newContent));
           evalSparkfile(newContent);
+          Spark.before(new ReloadFilter(_url, newContent));
         }
       } catch (Exception e) {
         throw GosuExceptionUtil.forceThrow(e);

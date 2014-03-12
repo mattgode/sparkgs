@@ -16,7 +16,14 @@ class SparkFile {
     var _params : Map<String, String> as Params
   }
 
+  structure Layout {
+    function renderToString(body : String) : String
+  }
+
+  static final var BODY_DELIMITER = "_SPARK_GOSU_BODY_SPARK_GOSU_BODY_"
   static var _THREAD_INFO = new ThreadLocal<RequestInfo>()
+
+  var _globalLayout : Layout as Layout
 
   //===================================================================
   //  Utility Properties
@@ -35,6 +42,10 @@ class SparkFile {
 
   property get Writer() : Writer {
     return _THREAD_INFO.get().Writer
+  }
+
+  property set StaticFiles(path : String) {
+    Spark.staticFileLocation(path)
   }
 
   construct(){
@@ -89,7 +100,16 @@ class SparkFile {
     _THREAD_INFO.set(new() { :Request = request, :Response = response, :Writer = writer, :Params = new ParamMap(request) })
     try
     {
+      var layoutSplit : String[]
+      if(Layout != null) {
+        var layout = Layout.renderToString(BODY_DELIMITER)
+        layoutSplit = layout.split(BODY_DELIMITER)
+        writer.write(layoutSplit[0])
+      }
       writer.write(body())
+      if(layoutSplit.length > 0) {
+        writer.write(layoutSplit[1])
+      }
       return ""
     }
     finally

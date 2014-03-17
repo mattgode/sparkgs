@@ -22,13 +22,14 @@ class SparkFile {
 
   static final var BODY_DELIMITER = "_SPARK_GOSU_BODY_SPARK_GOSU_BODY_"
   static var _THREAD_INFO = new ThreadLocal<RequestInfo>()
-
   var _globalLayout : Layout as Layout
+  static var _setStaticFiles = false;
 
   //===================================================================
   //  Utility Properties
   //===================================================================
   property get Request() : Request {
+    var x = ""
     return _THREAD_INFO.get().Request
   }
 
@@ -46,7 +47,12 @@ class SparkFile {
   }
 
   property set StaticFiles(path : String) {
-    Spark.staticFileLocation(path)
+    if(!_setStaticFiles) {
+      _setStaticFiles = true;
+      Spark.staticFileLocation(path)
+    } else {
+      print("Cannot reinitialize static directory...") //TODO cgross - log this properly
+    }
   }
 
   construct(){

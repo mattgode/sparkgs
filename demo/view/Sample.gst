@@ -2,13 +2,11 @@
 
 <p>This is great!!!!</p>
 
-<p>Wow</p>
+<h3>Wow</h3>
 
 <p>This is great!!!!</p>
 
-<p>This is great!!!!</p>
-
-<p>This is great!!!!</p>
+<hr/>
 
 <form action="post_to" method="post">
   <input type="text" name="foo"/>

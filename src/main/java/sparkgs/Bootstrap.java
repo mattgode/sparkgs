@@ -10,23 +10,22 @@ import gw.lang.reflect.gs.IGosuProgram;
 import gw.lang.reflect.gs.IProgramInstance;
 import gw.util.GosuExceptionUtil;
 import gw.util.StreamUtil;
-import spark.Filter;
-import spark.Request;
-import spark.Response;
 import spark.Spark;
-import spark.route.RouteMatcher;
-import spark.route.RouteMatcherFactory;
+import sparkgs.util.ReloadFilter;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
 public class Bootstrap {
+
+  private static boolean _startedInitialization = false;
+
   public static void main(String[] args) {
     try {
+      _startedInitialization = true;
       String sparkFile = "/spark.gsp";
       if (args.length > 0) {
         sparkFile = args[0];
@@ -59,7 +58,7 @@ public class Bootstrap {
     }
   }
 
-  private static void evalSparkfile(String content) throws ParseResultsException {
+  public static void evalSparkfile(String content) throws ParseResultsException {
     IGosuProgramParser programParser = GosuParserFactory.createProgramParser();
     List<String> packages = Arrays.asList("org.sparkgosu");
     ITypeUsesMap typeUses = CommonServices.getGosuIndustrialPark().createTypeUsesMap(packages);
@@ -74,29 +73,4 @@ public class Bootstrap {
     instance.evaluate(null);
   }
 
-  private static class ReloadFilter extends Filter {
-    private final String _content;
-    private final URL _url;
-
-    public ReloadFilter(URL url, String content) {
-      _url = url;
-      _content = content;
-    }
-
-    @Override
-    public void handle(Request request, Response response) {
-      try {
-        String newContent = new String(StreamUtil.getContent(_url.openStream()));
-        if (!newContent.equals(_content)) {
-          System.out.println("Sparkfile changed, reloading routes!");
-          TypeSystem.refresh(true);
-          RouteMatcherFactory.get().clearRoutes();
-          evalSparkfile(newContent);
-          Spark.before(new ReloadFilter(_url, newContent));
-        }
-      } catch (Exception e) {
-        throw GosuExceptionUtil.forceThrow(e);
-      }
-    }
-  }
 }

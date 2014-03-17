@@ -25,8 +25,16 @@ class SparkFile {
   var _globalLayout : Layout as Layout
   static var _setStaticFiles = false;
 
+  construct(){
+    // Look for a PORT environment variable
+    var port = System.getenv("PORT");
+    if (port != null) {
+      Spark.setPort(Integer.parseInt(port))
+    }
+  }
+
   //===================================================================
-  //  Utility Properties
+  //  API Properties
   //===================================================================
   property get Request() : Request {
     var x = ""
@@ -52,14 +60,6 @@ class SparkFile {
       Spark.staticFileLocation(path)
     } else {
       print("Cannot reinitialize static directory...") //TODO cgross - log this properly
-    }
-  }
-
-  construct(){
-    // Look for a PORT environment variable
-    var port = System.getenv("PORT");
-    if (port != null) {
-      Spark.setPort(Integer.parseInt(port))
     }
   }
 
@@ -102,6 +102,9 @@ class SparkFile {
     Spark.options(makeRoute(path, handler))
   }
 
+  //===================================================================
+  //  HTTP Verbs
+  //===================================================================
   private function sparkGosuWrapper(request: Request, response: Response, body : block():String) : String {
     var writer = new OutputStreamWriter(response.raw().OutputStream)
     _THREAD_INFO.set(new() { :Request = request, :Response = response, :Writer = writer, :Params = new ParamMap(request) })
@@ -127,7 +130,6 @@ class SparkFile {
   }
 
   private function makeRoute(path : String, handler: Object) : Route {
-
     if(handler typeis block():String) {
       var tmp = handler as block():String
       return new(path) {
@@ -144,7 +146,6 @@ class SparkFile {
         }
       }
     }
-
     return new(path) {
       override function handle(request: Request, response: Response) : String {
           return sparkGosuWrapper(request, response, \-> handler.toString());

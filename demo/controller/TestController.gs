@@ -3,7 +3,7 @@ package controller
 class TestController {
 
   function foo() : String {
-    return "Foo!"
+    return "Foo Foo!"
   }
 
 }

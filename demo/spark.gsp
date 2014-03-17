@@ -1,6 +1,7 @@
 // classpath "org.gosu-lang.gosu:sparkgs:0.10"
 // extends sparkgs.SparkFile
 
+uses controller.*
 uses view.*
 uses view.layout.*
 
@@ -14,8 +15,6 @@ get("/", \-> Sample.render(Writer) )
 
 get("/foo", "Foo!" )
 
-get("/bar", "Bar!" )
-
-get("/bar2", "Bar!" )
+get("/bar", new TestController().foo() )
 
 get("/square/:int", \-> Params['int'].toInt() * Params['int'].toInt() )

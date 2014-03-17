@@ -9,21 +9,13 @@ uses java.util.AbstractMap
 
 class SparkFile {
 
-  class RequestInfo {
-    var _req : Request as Request
-    var _res : Response as Response
-    var _writer : Writer as Writer
-    var _params : Map<String, String> as Params
-  }
-
   structure Layout {
     function renderToString(body : String) : String
   }
 
-  static final var BODY_DELIMITER = "_SPARK_GOSU_BODY_SPARK_GOSU_BODY_"
-  static var _THREAD_INFO = new ThreadLocal<RequestInfo>()
-  var _globalLayout : Layout as Layout
-  static var _setStaticFiles = false;
+  static var _globalLayout : Layout as Layout
+
+  static var _staticFilesSet = false;
 
   construct(){
     // Look for a PORT environment variable
@@ -36,27 +28,25 @@ class SparkFile {
   //===================================================================
   //  API Properties
   //===================================================================
-  property get Request() : Request {
-    var x = ""
-    return _THREAD_INFO.get().Request
+  property get Request() : SparkRequest {
+    return SparkRoute.Request
   }
 
-  property get Response() : Response {
-    return _THREAD_INFO.get().Response
+  property get Response() : SparkResponse {
+    return SparkRoute.Response
   }
 
   property get Params() : Map<String, String>  {
-    return _THREAD_INFO.get().Params
+    return SparkRoute.Request.Params
   }
 
   property get Writer() : Writer {
-    var x = ""
-    return _THREAD_INFO.get().Writer
+    return SparkRoute.Response.Writer
   }
 
   property set StaticFiles(path : String) {
-    if(!_setStaticFiles) {
-      _setStaticFiles = true;
+    if(!_staticFilesSet) {
+      _staticFilesSet = true;
       Spark.staticFileLocation(path)
     } else {
       print("Cannot reinitialize static directory...") //TODO cgross - log this properly
@@ -66,91 +56,60 @@ class SparkFile {
   //===================================================================
   //  HTTP Verbs
   //===================================================================
+
   function get(path : String, handler: Object ) {
-    Spark.get(makeRoute(path, handler))
+    Spark.get(new SparkRoute(path, handler))
   }
 
   function post(path : String, handler: Object ) {
-    Spark.post(makeRoute(path, handler))
+    Spark.post(new SparkRoute(path, handler))
   }
 
   function put(path : String, handler: Object ) {
-    Spark.put(makeRoute(path, handler))
+    Spark.put(new SparkRoute(path, handler))
   }
 
   function patch(path : String, handler: Object ) {
-    Spark.patch(makeRoute(path, handler))
+    Spark.patch(new SparkRoute(path, handler))
   }
 
   function delete(path : String, handler: Object ) {
-    Spark.delete(makeRoute(path, handler))
+    Spark.delete(new SparkRoute(path, handler))
   }
 
   function head(path : String, handler: Object ) {
-    Spark.head(makeRoute(path, handler))
+    Spark.head(new SparkRoute(path, handler))
   }
 
   function trace(path : String, handler: Object ) {
-    Spark.trace(makeRoute(path, handler))
+    Spark.trace(new SparkRoute(path, handler))
   }
 
   function connect(path : String, handler: Object ) {
-    Spark.connect(makeRoute(path, handler))
+    Spark.connect(new SparkRoute(path, handler))
   }
 
   function options(path : String, handler: Object ) {
-    Spark.options(makeRoute(path, handler))
+    Spark.options(new SparkRoute(path, handler))
   }
 
   //===================================================================
-  //  HTTP Verbs
+  //  Higher Level Route Definitions
   //===================================================================
-  private function sparkGosuWrapper(request: Request, response: Response, body : block():String) : String {
-    var writer = new OutputStreamWriter(response.raw().OutputStream)
-    _THREAD_INFO.set(new() { :Request = request, :Response = response, :Writer = writer, :Params = new ParamMap(request) })
-    try
-    {
-      var layoutSplit : String[]
-      if(Layout != null) {
-        var layout = Layout.renderToString(BODY_DELIMITER)
-        layoutSplit = layout.split(BODY_DELIMITER)
-        writer.write(layoutSplit[0])
-      }
-      writer.write(body())
-      if(layoutSplit.length > 0) {
-        writer.write(layoutSplit[1])
-      }
-      return ""
-    }
-    finally
-    {
-      writer.flush();
-      _THREAD_INFO.set(null);
-    }
-  }
 
-  private function makeRoute(path : String, handler: Object) : Route {
-    if(handler typeis block():String) {
-      var tmp = handler as block():String
-      return new(path) {
-        override function handle(request: Request, response: Response) : String {
-          return sparkGosuWrapper(request, response, tmp);
-        }
-      }
-    } else if(handler typeis block() ) {
-      var tmp = handler as block()
-      var tmp2 = \-> { tmp(); return "" }
-      return new(path) {
-        override function handle(request: Request, response: Response) : String {
-          return sparkGosuWrapper(request, response, tmp2);
-        }
-      }
+  function handle(path: String, handler: Object, verbs : List<SparkRequest.HttpVerb> = null) {
+    if(verbs == null) {
+      verbs = SparkRequest.HttpVerb.AllValues
     }
-    return new(path) {
-      override function handle(request: Request, response: Response) : String {
-          return sparkGosuWrapper(request, response, \-> handler.toString());
-      }
-    }
+    if(verbs.contains(SparkRequest.HttpVerb.GET)) get(path, handler)
+    if(verbs.contains(SparkRequest.HttpVerb.POST)) post(path, handler)
+    if(verbs.contains(SparkRequest.HttpVerb.PUT)) put(path, handler)
+    if(verbs.contains(SparkRequest.HttpVerb.PATCH)) patch(path, handler)
+    if(verbs.contains(SparkRequest.HttpVerb.DELETE)) delete(path, handler)
+    if(verbs.contains(SparkRequest.HttpVerb.HEAD)) head(path, handler)
+    if(verbs.contains(SparkRequest.HttpVerb.TRACE)) trace(path, handler)
+    if(verbs.contains(SparkRequest.HttpVerb.CONNECT)) connect(path, handler)
+    if(verbs.contains(SparkRequest.HttpVerb.OPTIONS)) options(path, handler)
   }
 
 }

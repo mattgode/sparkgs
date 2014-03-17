@@ -11,9 +11,11 @@ Layout = new AppLayoutTmp() // Should be AppLayout
 // Set location of static files
 StaticFiles = "/public"
 
-get("/", \-> Sample.render(Writer) )
+handle("/", \-> Sample.render(Writer), { GET, POST } )
 
-get("/foo", "Foo!" )
+get("/foo", "Foo!", {
+    get("/bar", \-> someFunc() )
+ })
 
 get("/bar", new TestController().foo() )
 

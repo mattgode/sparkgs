@@ -1,4 +1,4 @@
-package sparkgs;
+package sparkgs.util;
 
 import spark.Request;
 

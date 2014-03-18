@@ -28,6 +28,9 @@ class SparkRoute extends Route implements IHasRequestContext {
     using (new RequestSupport(new SparkRequest(request), new SparkResponse(response))) {
       using(new LayoutSupport()) {
         Writer.write(_body())
+        if(!Response.Committed) {
+          Writer.flush()
+        }
         return ""
       }
     }

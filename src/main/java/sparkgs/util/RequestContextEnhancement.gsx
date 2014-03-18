@@ -26,4 +26,8 @@ enhancement RequestContextEnhancement : IHasRequestContext {
     return Request.Session
   }
 
+  function redirect(to: String, code = 302) {
+    Response.redirect(to, code)
+  }
+
 }

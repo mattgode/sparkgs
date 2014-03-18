@@ -5,12 +5,11 @@ uses controller.*
 uses view.*
 uses view.layout.*
 
-// Set layout
+// Config
 Layout = new AppLayoutTmp() // Should be AppLayout
-
-// Set location of static files
 StaticFiles = "/public"
 
+// Routes
 handle("/", \-> Sample.render(Writer), { GET, POST } )
 
 get("/foo", "Foo!")
@@ -21,3 +20,4 @@ handle("/post_to", \-> Params['foo'] )
 
 handle("/handle", \-> Request.IsGet )
 
+get("/redirect", \-> redirect("/foo") )

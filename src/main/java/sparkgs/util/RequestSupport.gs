@@ -26,7 +26,6 @@ class RequestSupport implements  Closeable {
   }
 
   override function close() {
-    Response.Writer.flush();
     _THREAD_INFO.set(null);
   }
 

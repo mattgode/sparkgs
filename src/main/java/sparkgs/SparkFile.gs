@@ -1,19 +1,10 @@
 package sparkgs
 
 uses spark.*
+uses sparkgs.util.*
 uses java.lang.*
-uses java.util.*
-uses java.io.*
-uses java.util.Map
-uses java.util.AbstractMap
 
-class SparkFile {
-
-  structure Layout {
-    function renderToString(body : String) : String
-  }
-
-  static var _globalLayout : Layout as Layout
+class SparkFile implements IHasRequestContext {
 
   static var _staticFilesSet = false;
 
@@ -21,29 +12,13 @@ class SparkFile {
     // Look for a PORT environment variable
     var port = System.getenv("PORT");
     if (port != null) {
-      Spark.setPort(Integer.parseInt(port))
+      Port = Integer.parseInt(port)
     }
   }
 
   //===================================================================
-  //  API Properties
+  //  Config Properties
   //===================================================================
-  property get Request() : SparkRequest {
-    return SparkRoute.Request
-  }
-
-  property get Response() : SparkResponse {
-    return SparkRoute.Response
-  }
-
-  property get Params() : Map<String, String>  {
-    return SparkRoute.Request.Params
-  }
-
-  property get Writer() : Writer {
-    return SparkRoute.Response.Writer
-  }
-
   property set StaticFiles(path : String) {
     if(!_staticFilesSet) {
       _staticFilesSet = true;
@@ -53,11 +28,19 @@ class SparkFile {
     }
   }
 
+  property set Layout(layout : LayoutSupport.Layout ) {
+    LayoutSupport.GlobalLayout = layout
+  }
+
+  property set Port(port : int) {
+    Spark.setPort(port)
+  }
+
   //===================================================================
-  //  HTTP Verbs
+  //  Routing - HTTP Verbs
   //===================================================================
 
-  function get(path : String, handler: Object ) {
+  function get(path : String, handler: Object) {
     Spark.get(new SparkRoute(path, handler))
   }
 
@@ -94,7 +77,7 @@ class SparkFile {
   }
 
   //===================================================================
-  //  Higher Level Route Definitions
+  //  Routing - Higher Level Definitions
   //===================================================================
 
   function handle(path: String, handler: Object, verbs : List<SparkRequest.HttpVerb> = null) {

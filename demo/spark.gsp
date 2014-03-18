@@ -13,10 +13,4 @@ StaticFiles = "/public"
 
 handle("/", \-> Sample.render(Writer), { GET, POST } )
 
-get("/foo", "Foo!", {
-    get("/bar", \-> someFunc() )
- })
-
-get("/bar", new TestController().foo() )
-
-get("/square/:int", \-> Params['int'].toInt() * Params['int'].toInt() )
+get("/foo", "Foo!")

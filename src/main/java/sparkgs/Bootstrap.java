@@ -21,11 +21,8 @@ import java.util.List;
 
 public class Bootstrap {
 
-  private static boolean _startedInitialization = false;
-
   public static void main(String[] args) {
     try {
-      _startedInitialization = true;
       String sparkFile = "/spark.gsp";
       if (args.length > 0) {
         sparkFile = args[0];

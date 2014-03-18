@@ -4,6 +4,9 @@ uses spark.*
 uses sparkgs.util.*
 uses java.lang.*
 uses gw.lang.reflect.IRelativeTypeInfo
+uses gw.lang.reflect.IParameterInfo
+uses gw.lang.reflect.TypeSystem
+uses gw.lang.reflect.ReflectUtil
 
 class SparkFile implements IHasRequestContext {
 
@@ -97,7 +100,6 @@ class SparkFile implements IHasRequestContext {
   }
 
   function resource(path : String, controller : IResourceController) {
-
     // Basic collection REST-ful URLs
     get(path, \-> controller.index())
     get(path + "/new", \-> controller._new())
@@ -123,7 +125,33 @@ class SparkFile implements IHasRequestContext {
         }
       }
     }
-
-
   }
+
+  function rpc(path : String, controller : Object) {
+    var typeInfo = (typeof controller).TypeInfo
+    if(typeInfo typeis IRelativeTypeInfo) {
+      var publicMethods = typeInfo.DeclaredMethods.where( \ m -> m.Public && not m.Static )
+      var addedMethods = {}
+      for(m in publicMethods) {
+        if(!addedMethods.contains(m.DisplayName)) {
+          handle(path + "/" + m.DisplayName.toLowerCase(), \-> m.CallHandler.handleCall(controller, populateArgs(m.Parameters)))
+        } else {
+          //TODO - log method overloading warning
+        }
+      }
+    }
+  }
+
+  function populateArgs(params : IParameterInfo[]) : Object[] {
+    var result = new Object[params.length]
+    for(p in params index i) {
+      try {
+        result[i] = ParamConverter.convertValue(p.FeatureType, Params[p.DisplayName])
+      } catch(e) {
+        Writer.append("Bad value for param #{p.DisplayName} of type ${p.FeatureType.DisplayName} : ${Params[p.DisplayName]}")
+      }
+    }
+    return result;
+  }
+
 }

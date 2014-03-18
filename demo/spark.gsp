@@ -25,3 +25,5 @@ handle("/handle", \-> Request.IsGet )
 get("/redirect", \-> redirect("/foo") )
 
 resource("/contacts", new ContactsController())
+
+rpc("/rpc", new RPCExample())

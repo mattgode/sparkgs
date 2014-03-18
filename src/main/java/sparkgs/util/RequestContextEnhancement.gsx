@@ -29,5 +29,4 @@ enhancement RequestContextEnhancement : IHasRequestContext {
   function redirect(to: String, code = 302) {
     Response.redirect(to, code)
   }
-
 }

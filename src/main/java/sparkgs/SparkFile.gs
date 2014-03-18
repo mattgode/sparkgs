@@ -32,8 +32,12 @@ class SparkFile implements IHasRequestContext {
     }
   }
 
-  property set Layout(layout : LayoutSupport.Layout ) {
-    LayoutSupport.GlobalLayout = layout
+  property set DefaultLayout(layout : Layout ) {
+    LayoutAwareWriter.DefaultLayout = layout
+  }
+
+  property set Layout(layout : Layout) {
+    Response.Writer.Layout = layout
   }
 
   property set Port(port : int) {

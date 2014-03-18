@@ -25,11 +25,14 @@ class SparkRoute extends Route implements IHasRequestContext {
   }
 
   override function handle(request: Request, response: Response): String {
-    using (new RequestSupport(new SparkRequest(request), new SparkResponse(response))) {
-      using(new LayoutSupport()) {
-        Writer.write(_body())
+    var writer = new LayoutAwareWriter(response.raw().OutputStream)
+    using (new RequestSupport(new SparkRequest(request),
+                              new SparkResponse(){:SparkJavaResponse = response,
+                                                  :Writer = writer})) {
+      using(writer) {
+        writer.write(_body())
         if(!Response.Committed) {
-          Writer.flush()
+          writer.flush()
         }
         return ""
       }

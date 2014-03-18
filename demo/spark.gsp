@@ -10,7 +10,7 @@ Layout = new AppLayoutTmp() // Should be AppLayout
 StaticFiles = "/public"
 
 // Routes
-handle("/", \-> Sample.render(Writer), { GET, POST } )
+handle("/", \-> Sample.render(Writer), :verbs = { GET, POST } )
 
 get("/foo", "Foo!")
 

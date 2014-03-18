@@ -27,4 +27,13 @@ class ContactsController implements IHasRequestContext, IResourceController {
   override function update(id: String) {
     Writer.append("Update ${Params['id']}")
   }
+
+  function search() {
+    Writer.append("Search")
+  }
+
+  function addresses(id : String) {
+    Writer.append("Update ${Params['id']}")
+  }
+
 }

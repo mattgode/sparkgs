@@ -3,6 +3,7 @@ package sparkgs
 uses spark.*
 uses sparkgs.util.*
 uses java.lang.*
+uses gw.lang.reflect.IRelativeTypeInfo
 
 class SparkFile implements IHasRequestContext {
 
@@ -97,13 +98,32 @@ class SparkFile implements IHasRequestContext {
 
   function resource(path : String, controller : IResourceController) {
 
+    // Basic collection REST-ful URLs
     get(path, \-> controller.index())
     get(path + "/new", \-> controller._new())
     post(path, \-> controller.create())
 
+    // Basic instance REST-ful URLs
     get(path + "/:id", \-> controller.show(Params['id']))
     get(path + "/:id/edit", \-> controller.edit(Params['id']))
     put(path + "/:id", \-> controller.update(Params['id']))
+
+    // Additional methods
+    if(controller.IntrinsicType.TypeInfo typeis IRelativeTypeInfo) {
+      var publicMethods = controller.IntrinsicType.TypeInfo.DeclaredMethods.where( \ m -> m.Public && not m.Static )
+      for(m in publicMethods) {
+        if(!{"index", "_new", "show", "create", "edit", "update"}.contains(m.DisplayName)) {
+          if(m.Parameters.length == 0){
+            handle(path + "/" + m.DisplayName.toLowerCase(), \-> m.CallHandler.handleCall(controller, {}))
+          }
+          else if(m.Parameters.length == 1 && m.Parameters[0].FeatureType == String)
+          {
+            handle(path + "/:id/" + m.DisplayName.toLowerCase(), \-> m.CallHandler.handleCall(controller, {Params['id']}))
+          }
+        }
+      }
+    }
+
 
   }
 }

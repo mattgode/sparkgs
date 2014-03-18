@@ -16,6 +16,8 @@ get("/foo", "Foo!")
 
 get("/bar", \-> "Bar!")
 
+get("/doh", \-> "Smergy!")
+
 handle("/post_to", \-> Params['foo'] )
 
 handle("/handle", \-> Request.IsGet )

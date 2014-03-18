@@ -34,6 +34,7 @@
 					<li><a href="/">Home</a></li>
 					<li><a href="/foo">Foo</a></li>
 					<li><a href="/bar">Bar</a></li>
+					<li><a href="/doh">Doh</a></li>
 				</ul>
 			</div><!--/.nav-collapse -->
 		</div>

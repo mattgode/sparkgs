@@ -21,3 +21,5 @@ handle("/post_to", \-> Params['foo'] )
 handle("/handle", \-> Request.IsGet )
 
 get("/redirect", \-> redirect("/foo") )
+
+resource("/contacts", new ContactsController())

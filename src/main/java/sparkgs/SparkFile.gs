@@ -95,4 +95,15 @@ class SparkFile implements IHasRequestContext {
     if(verbs.contains(SparkRequest.HttpVerb.OPTIONS)) options(path, handler)
   }
 
+  function resource(path : String, controller : IResourceController) {
+
+    get(path, \-> controller.index())
+    get(path + "/new", \-> controller._new())
+    post(path, \-> controller.create())
+
+    get(path + "/:id", \-> controller.show(Params['id']))
+    get(path + "/:id/edit", \-> controller.edit(Params['id']))
+    put(path + "/:id", \-> controller.update(Params['id']))
+
+  }
 }

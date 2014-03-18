@@ -1,8 +1,8 @@
 package sparkgs
 
-uses java.util.Map
-uses spark.Request
-uses sparkgs.util.ParamMap
+uses java.util.*
+uses spark.*
+uses sparkgs.util.*
 
 class SparkRequest {
 
@@ -18,12 +18,16 @@ class SparkRequest {
     OPTIONS,
   }
 
-  var _params : Map<String, String> as Params
-  var _request : Request as SparkJavaRequest
+  var _params : Map<String, String> as readonly Params
+  var _attributes : Map<String, Object> as readonly Attributes
+  var _request : Request as readonly SparkJavaRequest
+  var _session : SessionMap as readonly Session
 
   construct(request:Request) {
     _request = request;
     _params = new ParamMap(SparkJavaRequest)
+    _attributes = new AttributesMap(SparkJavaRequest)
+    _session = new SessionMap(SparkJavaRequest)
   }
 
   //----------------------------------------------------------------------
@@ -89,5 +93,44 @@ class SparkRequest {
     return _request.cookies()
   }
 
+  property get Headers() : Set<String> {
+    return _request.headers()
+  }
+
+  property get Host() : String {
+    return _request.host()
+  }
+
+  property get IP() : String {
+    return _request.ip()
+  }
+
+  property get PathInfo() : String {
+    return _request.pathInfo()
+  }
+
+  property get UserAgent() : String {
+    return _request.userAgent()
+  }
+
+  property get Splat() : String[] {
+    return _request.splat()
+  }
+
+  property get Scheme() : String {
+    return _request.scheme()
+  }
+
+  property get URL() : String {
+    return _request.url()
+  }
+
+  property get Port() : int {
+    return _request.port()
+  }
+
+  property get Attributes() : Map<String, Object> {
+    return _attributes
+  }
 
 }

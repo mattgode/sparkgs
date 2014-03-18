@@ -22,4 +22,8 @@ enhancement RequestContextEnhancement : IHasRequestContext {
     return RequestSupport.Response.Writer
   }
 
+  property get Session() : SessionMap {
+    return Request.Session
+  }
+
 }

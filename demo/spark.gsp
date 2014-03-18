@@ -14,3 +14,10 @@ StaticFiles = "/public"
 handle("/", \-> Sample.render(Writer), { GET, POST } )
 
 get("/foo", "Foo!")
+
+get("/bar", \-> "Bar!")
+
+handle("/post_to", \-> Params['foo'] )
+
+handle("/handle", \-> Request.IsGet )
+

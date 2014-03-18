@@ -1,9 +1,8 @@
 package sparkgs
 
-uses spark.Request
-uses spark.Response
-uses spark.Route
+uses spark.*
 uses sparkgs.util.*
+uses gw.lang.function.IBlock
 
 class SparkRoute extends Route implements IHasRequestContext {
 
@@ -11,11 +10,15 @@ class SparkRoute extends Route implements IHasRequestContext {
 
   construct(path : String, handler: Object) {
     super(path)
-    if(handler typeis block():String) {
-      _body = handler
-    } else if(handler typeis block() ) {
-      var blk = handler as block()
-      _body = \-> { blk() return "" }
+    if(handler typeis IBlock) {
+      _body = \-> {
+        var body = handler.invokeWithArgs({})
+        if(body != null) {
+          return body.toString();
+        } else {
+          return ""
+        }
+      }
     } else {
       _body = \-> handler.toString();
     }

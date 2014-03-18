@@ -12,3 +12,7 @@
   <input type="text" name="foo"/>
   <button>Submit</button>
 </form>
+
+<form action="/handle" method="post">
+  <button>Post To Handle</button>
+</form>

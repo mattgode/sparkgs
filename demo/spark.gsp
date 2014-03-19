@@ -4,6 +4,7 @@
 uses controller.*
 uses view.*
 uses view.layout.*
+uses java.util.*
 
 // Config
 DefaultLayout = new AppLayoutTmp() // Should be AppLayout
@@ -38,4 +39,13 @@ get("/nested", \-> {
   Layout = new NestedLayoutTmp()
   Writer.append("asdfsadf")
 })
+
+// Cookie example
+get("/cookie1", \-> {
+  Cookies["Foo"] =  UUID.randomUUID().toString()
+  redirect("/cookie2")
+})
+
+get("/cookie2", \-> Cookies["Foo"] )
+
 

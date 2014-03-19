@@ -26,6 +26,10 @@ enhancement RequestContextEnhancement : IHasRequestContext {
     return Request.Session
   }
 
+  property get Cookies() : CookieJar {
+    return CookieJar.Instance
+  }
+
   function redirect(to: String, code = 302) {
     Response.redirect(to, code)
   }

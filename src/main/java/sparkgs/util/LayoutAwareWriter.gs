@@ -5,7 +5,7 @@ uses java.util. *
 uses java.lang.CharSequence
 uses sparkgs.Layout
 
-class LayoutAwareWriter extends OutputStreamWriter {
+class LayoutAwareWriter extends OutputStreamWriter implements IHasRequestContext {
 
   static var _globalLayout: Layout as DefaultLayout
   static final var BODY_DELIMITER = "_SPARK_GOSU_BODY_SPARK_GOSU_BODY_"
@@ -43,10 +43,12 @@ class LayoutAwareWriter extends OutputStreamWriter {
   }
 
   override function close() {
-    while (_layoutEnd.size() > 0) {
-      write(_layoutEnd.pop().toString())
+    if(not Response.Committed) {
+      while (_layoutEnd.size() > 0) {
+        write(_layoutEnd.pop().toString())
+      }
+      super.close()
     }
-    super.close()
   }
 
   override function write(cbuf: char[]) {

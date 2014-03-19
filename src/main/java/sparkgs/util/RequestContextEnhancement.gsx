@@ -30,6 +30,10 @@ enhancement RequestContextEnhancement : IHasRequestContext {
     return CookieJar.Instance
   }
 
+  property get Headers() : HeaderMap {
+    return HeaderMap.Instance
+  }
+
   function redirect(to: String, code = 302) {
     Response.redirect(to, code)
   }

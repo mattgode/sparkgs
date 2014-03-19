@@ -48,4 +48,10 @@ get("/cookie1", \-> {
 
 get("/cookie2", \-> Cookies["Foo"] )
 
+// Header example
+get("/header", \-> {
+  Headers["X-Foo"] = "Bar"
+  return "derp"
+})
+
 

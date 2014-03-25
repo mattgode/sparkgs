@@ -1,9 +1,20 @@
 package controller
 
-class TestController {
+class TestController implements sparkgs.util.IHasRequestContext {
+  
+  static var counter = 0;
 
-  function foo() : String {
-    return "Foo Foo!"
+  function foo() {
+	counter++
+    Writer.append( "Foo Foo! ${counter}" )
+  }
+
+  static function staticFoo() : String {
+    return "Static Foo Foo!"
+  }
+
+  function bar(s : String) : String {
+    return "Bar Bar!"
   }
 
 }

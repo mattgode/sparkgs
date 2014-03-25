@@ -45,7 +45,6 @@ get("/cookie1", \-> {
   Cookies["Foo"] =  UUID.randomUUID().toString()
   redirect("/cookie2")
 })
-
 get("/cookie2", \-> Cookies["Foo"] )
 
 // Header example
@@ -54,4 +53,8 @@ get("/header", \-> {
   return "derp"
 })
 
+// Feature Literal Examples
+get("/fl_example", TestController#foo())
+get("/fl_static_example", TestController#staticFoo())
+get("/fl_bad", TestController#bar())
 

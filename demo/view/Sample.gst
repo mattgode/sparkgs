@@ -16,3 +16,13 @@
 <form action="/handle" method="post">
   <button>Post To Handle</button>
 </form>
+
+<table class="table">
+<% for(i in 1..2000) {  %>
+	<tr>
+      <td>Number: ${i}</td>
+      <td>Foo</td>
+      <td>Bar</td>
+    </tr>
+<% } %>
+</table>

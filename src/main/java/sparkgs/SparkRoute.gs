@@ -3,24 +3,33 @@ package sparkgs
 uses spark.*
 uses sparkgs.util.*
 uses gw.lang.function.IBlock
+uses gw.lang.reflect.features.*
 
 class SparkRoute extends Route implements IHasRequestContext {
 
-  var _body():String
+  var _body():Object
 
   construct(path : String, handler: Object) {
     super(path)
     if(handler typeis IBlock) {
-      _body = \-> {
-        var body = handler.invokeWithArgs({})
-        if(body != null) {
-          return body.toString();
+      _body = \-> handler.invokeWithArgs({})
+    } else if(handler typeis IMethodReference) {
+      if(handler.MethodInfo.Parameters.length > 0) {
+        _body = \-> { throw "Only no-arg methods can be used as routes!" }
+      } else if(handler.MethodInfo.Static) {
+        _body = \-> handler.evaluate({})
+      } else if(handler typeis BoundMethodReference) {
+        _body = \-> handler.evaluate({})
+      } else {
+        var ctor = handler.RootType.TypeInfo.getCallableConstructor({})
+        if(ctor != null) {
+          _body = \-> handler.evaluate({ctor.Constructor.newInstance({})})
         } else {
-          return ""
+          _body = \-> { throw "Cannot find a no-arg contructor for ${handler.RootType}" }
         }
       }
     } else {
-      _body = \-> handler.toString();
+      _body = \-> handler
     }
   }
 
@@ -30,7 +39,10 @@ class SparkRoute extends Route implements IHasRequestContext {
                               new SparkResponse(){:SparkJavaResponse = response,
                                                   :Writer = writer})) {
       using(writer) {
-        writer.write(_body())
+        var body = _body() as String
+        if(body != null) {
+          writer.write(body)
+        }
         if(!Response.Committed) {
           writer.flush()
         }

@@ -16,4 +16,12 @@ class SparkResponse {
     return _response.raw().Committed
   }
 
+  property set Status(val : int) {
+    _response.status(val)
+  }
+
+  property set Type(type : String) {
+    _response.type(type)
+  }
+
 }

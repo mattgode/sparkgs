@@ -129,8 +129,4 @@ class SparkRequest {
     return _request.port()
   }
 
-  property get Attributes() : Map<String, Object> {
-    return _attributes
-  }
-
 }

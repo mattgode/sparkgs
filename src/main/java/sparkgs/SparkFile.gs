@@ -112,7 +112,7 @@ class SparkFile implements IHasRequestContext {
     // Basic instance REST-ful URLs
     get(path + "/:id", \-> controller.show(Params['id']))
     get(path + "/:id/edit", \-> controller.edit(Params['id']))
-    put(path + "/:id", \-> controller.update(Params['id']))
+    handle(path + "/:id", \-> controller.update(Params['id']), :verbs = {PUT, POST})
 
     // Additional methods
     if(controller.IntrinsicType.TypeInfo typeis IRelativeTypeInfo) {

@@ -1,4 +1,5 @@
 www
 .idea
 sparkgs.iml
-
+out
+target

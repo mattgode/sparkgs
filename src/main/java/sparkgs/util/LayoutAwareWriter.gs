@@ -96,11 +96,13 @@ class LayoutAwareWriter extends OutputStreamWriter implements IHasRequestContext
   }
 
   private function handleLayout(layout: Layout) {
-    var str = layout.renderToString(BODY_DELIMITER)
-    var layoutSplit = str.split(BODY_DELIMITER)
-    write(layoutSplit[0])
-    if(layoutSplit.length > 1) {
-      _layoutEnd.push(layoutSplit[1])
+    if(layout != null) {
+      var str = layout.renderToString(BODY_DELIMITER)
+      var layoutSplit = str.split(BODY_DELIMITER)
+      write(layoutSplit[0])
+      if(layoutSplit.length > 1) {
+        _layoutEnd.push(layoutSplit[1])
+      }
     }
   }
 }

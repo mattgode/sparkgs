@@ -5,8 +5,6 @@ uses sparkgs.util.*
 uses java.lang.*
 uses gw.lang.reflect.IRelativeTypeInfo
 uses gw.lang.reflect.IParameterInfo
-uses gw.lang.reflect.TypeSystem
-uses gw.lang.reflect.ReflectUtil
 
 class SparkFile implements IHasRequestContext {
 
@@ -14,7 +12,7 @@ class SparkFile implements IHasRequestContext {
 
   construct(){
     // Look for a PORT environment variable
-    var port = System.getenv("PORT");
+    var port = System.Env["PORT"]
     if (port != null) {
       Port = Integer.parseInt(port)
     }

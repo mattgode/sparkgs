@@ -71,5 +71,21 @@
         </excludes>
       </resource>
     </resources>
+
+      <pluginManagement>
+          <plugins>
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-jar-plugin</artifactId>
+                  <configuration>
+                      <archive>
+                          <manifestEntries>
+                              <Contains-Sources>true</Contains-Sources>
+                          </manifestEntries>
+                      </archive>
+                  </configuration>
+              </plugin>
+          </plugins>
+      </pluginManagement>
   </build>
 </project>

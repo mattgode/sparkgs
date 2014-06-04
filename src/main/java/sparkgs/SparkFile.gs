@@ -3,10 +3,11 @@ package sparkgs
 uses spark.*
 uses sparkgs.util.*
 uses java.lang.*
-uses gw.lang.reflect.IRelativeTypeInfo
-uses gw.lang.reflect.IParameterInfo
+uses gw.lang.reflect.*
+uses gw.lang.reflect.gs.*
+uses gw.lang.cli.*
 
-class SparkFile implements IHasRequestContext {
+abstract class SparkFile implements IHasRequestContext, IManagedProgramInstance {
 
   static var _staticFilesSet = false;
 
@@ -30,12 +31,12 @@ class SparkFile implements IHasRequestContext {
     }
   }
 
-  property set DefaultLayout(layout : Layout ) {
-    LayoutAwareWriter.DefaultLayout = layout
-  }
-
   property set Layout(layout : Layout) {
-    Response.Writer.Layout = layout
+    if(Response != null) {
+      Response.Writer.Layout = layout
+    } else {
+      LayoutAwareWriter.DefaultLayout = layout
+    }
   }
 
   property set Port(port : int) {
@@ -154,6 +155,26 @@ class SparkFile implements IHasRequestContext {
       }
     }
     return result;
+  }
+
+  //===================================================================
+  // Command line arg handling
+  //===================================================================
+
+  override function afterExecution( t : Throwable ) {
+    if(t != null) {
+      print("Error when evaluating SparkFile:")
+      t.printStackTrace()
+    }
+  }
+
+  override function beforeExecution() : boolean {
+    if(CommandLineAccess.RawArgs.size() > 1) {
+      if(CommandLineAccess.RawArgs[0] == "--port") {
+        Port = CommandLineAccess.RawArgs[1].toInt()
+      }
+    }
+    return true
   }
 
 }

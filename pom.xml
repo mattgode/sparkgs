@@ -3,10 +3,17 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.gosu-lang.sparkgs</groupId>
   <artifactId>sparkgs</artifactId>
-  <packaging>pom</packaging>
   <version>0.1-SNAPSHOT</version>
   <name>sparkgs</name>
   <url>http://sparkgs.github.io/</url>
+
+  <repositories>
+    <repository>
+      <id>gosu-lang.org-releases</id>
+      <name>Official Gosu website (releases)</name>
+      <url>http://gosu-lang.org/repositories/m2/releases</url>
+    </repository>
+  </repositories>
 
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -15,6 +22,18 @@
   </parent>
 
   <dependencies>
+    <dependency>
+      <groupId>org.gosu-lang.gosu</groupId>
+      <artifactId>gosu</artifactId>
+      <version>0.10.J82</version>
+      <type>pom</type>
+      <exclusions>
+        <exclusion>
+          <artifactId>tools</artifactId>
+          <groupId>com.sun</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

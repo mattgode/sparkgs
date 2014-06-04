@@ -11,7 +11,6 @@ import spark.Request;
 import spark.Response;
 import spark.Spark;
 import spark.route.RouteMatcherFactory;
-import sparkgs.Bootstrap;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -97,7 +96,8 @@ public class ReloadFilter extends Filter {
       if (!newContent.equals(_content)) {
         System.out.println("Sparkfile changed, reloading routes!");
         RouteMatcherFactory.get().clearRoutes();
-        Bootstrap.evalSparkfile(newContent);
+        //TODO cgross - reimplement
+        //Bootstrap.evalSparkfile(newContent);
         Spark.before(new ReloadFilter(_url, newContent, _timeStamps));
       }
     } catch (Exception e) {

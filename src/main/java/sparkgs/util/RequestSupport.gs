@@ -18,11 +18,11 @@ class RequestSupport implements  Closeable {
   }
 
   static property get Request(): SparkRequest {
-    return _THREAD_INFO.get().Req
+    return _THREAD_INFO.get()?.Req
   }
 
   static property get Response(): SparkResponse {
-    return _THREAD_INFO.get().Resp
+    return _THREAD_INFO.get()?.Resp
   }
 
   override function close() {

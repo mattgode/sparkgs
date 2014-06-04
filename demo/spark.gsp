@@ -1,14 +1,16 @@
-// classpath "org.gosu-lang.gosu:sparkgs:0.10"
-// extends sparkgs.SparkFile
+#!/usr/bin/env gosu
+classpath "org.gosu-lang.sparkgs:sparkgs:0.1-SNAPSHOT,."
 
 uses controller.*
 uses view.*
 uses view.layout.*
 uses java.util.*
 
+extends sparkgs.SparkFile
+
 // Config
-DefaultLayout = new AppLayoutTmp() // Should be AppLayout
 StaticFiles = "/public"
+Layout = AppLayout
 
 // Routes
 
@@ -36,7 +38,7 @@ rpc("/rpc", new RPCExample())
 // Nested Layout Example
 get("/nested", \-> {
   Writer.append("")
-  Layout = new NestedLayoutTmp()
+  Layout = NestedLayout
   Writer.append("asdfsadf")
 })
 

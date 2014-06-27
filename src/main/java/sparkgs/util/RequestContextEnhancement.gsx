@@ -6,6 +6,16 @@ uses java.io.Writer
 
 enhancement RequestContextEnhancement : IHasRequestContext {
 
+  function raw(str : Object) : RawContent {
+    return new() {:Content = str}
+  }
+
+  property set Layout(layout: Layout) {
+    if (Response != null) {
+      Response.Writer.Layout = layout
+    }
+  }
+
   property get Request() : SparkRequest {
     return RequestSupport.Request
   }

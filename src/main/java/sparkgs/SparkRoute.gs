@@ -39,12 +39,14 @@ class SparkRoute extends Route implements IHasRequestContext {
                               new SparkResponse(){:SparkJavaResponse = response,
                                                   :Writer = writer})) {
       using(writer) {
-        var body = _body() as String
-        if(body != null) {
+        var body = _body()
+        if(body typeis String) {
           writer.write(body)
-        }
-        if(!Response.Committed) {
-          writer.flush()
+          if(!Response.Committed) {
+            writer.flush()
+          }
+        } if (body typeis RawContent) {
+          return body.toString()
         }
         return ""
       }

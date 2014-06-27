@@ -42,11 +42,11 @@ class SparkRoute extends Route implements IHasRequestContext {
         var body = _body()
         if(body typeis String) {
           writer.write(body)
-          if(!Response.Committed) {
-            writer.flush()
-          }
         } if (body typeis RawContent) {
           writer.writeRaw(body.toString())
+        }
+        if(!Response.Committed) {
+          writer.flush()
         }
         return ""
       }

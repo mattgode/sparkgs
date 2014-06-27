@@ -108,11 +108,6 @@ abstract class SparkFile implements IHasRequestContext, IManagedProgramInstance 
     get(path + "/new", \-> controller._new())
     post(path, \-> controller.create())
 
-    // Basic instance REST-ful URLs
-    get(path + "/:id", \-> controller.show(Params['id']))
-    get(path + "/:id/edit", \-> controller.edit(Params['id']))
-    handle(path + "/:id", \-> controller.update(Params['id']), :verbs = {PUT, POST})
-
     // Additional methods
     if(controller.IntrinsicType.TypeInfo typeis IRelativeTypeInfo) {
       var publicMethods = controller.IntrinsicType.TypeInfo.DeclaredMethods.where( \ m -> m.Public && not m.Static )
@@ -128,6 +123,11 @@ abstract class SparkFile implements IHasRequestContext, IManagedProgramInstance 
         }
       }
     }
+
+    // Basic instance REST-ful URLs
+    get(path + "/:id", \-> controller.show(Params['id']))
+    get(path + "/:id/edit", \-> controller.edit(Params['id']))
+    handle(path + "/:id", \-> controller.update(Params['id']), :verbs = {PUT, POST})
   }
 
   function rpc(path : String, controller : Object) {

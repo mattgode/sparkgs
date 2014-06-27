@@ -10,12 +10,6 @@ enhancement RequestContextEnhancement : IHasRequestContext {
     return new() {:Content = str}
   }
 
-  property set Layout(layout: Layout) {
-    if (Response != null) {
-      Response.Writer.Layout = layout
-    }
-  }
-
   property get Request() : SparkRequest {
     return RequestSupport.Request
   }

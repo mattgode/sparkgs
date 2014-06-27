@@ -57,7 +57,7 @@ class LayoutAwareWriter extends OutputStreamWriter implements IHasRequestContext
   }
 
   function writeRaw(str: String) {
-    super.write(str)
+    super.write(str, 0, str.length())
   }
 
   override function write(str: String) {

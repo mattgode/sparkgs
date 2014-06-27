@@ -6,6 +6,7 @@ uses java.lang.*
 uses gw.lang.reflect.*
 uses gw.lang.reflect.gs.*
 uses gw.lang.cli.*
+uses java.io.File
 
 abstract class SparkFile implements IHasRequestContext, IManagedProgramInstance {
 
@@ -25,7 +26,13 @@ abstract class SparkFile implements IHasRequestContext, IManagedProgramInstance 
   property set StaticFiles(path : String) {
     if(!_staticFilesSet) {
       _staticFilesSet = true;
-      Spark.staticFileLocation(path)
+      if(new File(".", path).exists()){
+        Spark.externalStaticFileLocation(new File(".", path).AbsolutePath)
+      } else if(new File(path).exists()) {
+        Spark.externalStaticFileLocation(new File(path).AbsolutePath)
+      } else {
+        Spark.staticFileLocation(path)
+      }
     } else {
       print("Cannot reinitialize static directory...") //TODO cgross - log this properly
     }

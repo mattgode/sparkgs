@@ -56,6 +56,10 @@ class LayoutAwareWriter extends OutputStreamWriter implements IHasRequestContext
     super.write(cbuf)
   }
 
+  function writeRaw(str: String) {
+    super.write(str)
+  }
+
   override function write(str: String) {
     maybeStartLayout()
     super.write(str)

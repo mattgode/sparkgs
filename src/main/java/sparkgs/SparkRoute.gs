@@ -46,7 +46,7 @@ class SparkRoute extends Route implements IHasRequestContext {
             writer.flush()
           }
         } if (body typeis RawContent) {
-          return body.toString()
+          writer.writeRaw(body.toString())
         }
         return ""
       }

@@ -4,7 +4,7 @@ uses java.util.*
 uses spark.*
 uses sparkgs.util.*
 
-class SparkRequest {
+class SparkGSRequest {
 
   enum HttpVerb {
     GET,

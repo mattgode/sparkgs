@@ -5,12 +5,11 @@ uses sparkgs.util.*
 uses gw.lang.function.IBlock
 uses gw.lang.reflect.features.*
 
-class SparkRoute extends Route implements IHasRequestContext {
+class SparkGSRoute implements Route, IHasRequestContext {
 
   var _body():Object
 
-  construct(path : String, handler: Object) {
-    super(path)
+  construct(handler: Object) {
     if(handler typeis IBlock) {
       _body = \-> handler.invokeWithArgs({})
     } else if(handler typeis IMethodReference) {
@@ -34,22 +33,17 @@ class SparkRoute extends Route implements IHasRequestContext {
   }
 
   override function handle(request: Request, response: Response): String {
-    var writer = new LayoutAwareWriter(response.raw().OutputStream)
-    using (new RequestSupport(new SparkRequest(request),
-                              new SparkResponse(){:SparkJavaResponse = response,
-                                                  :Writer = writer})) {
-      using(writer) {
-        var body = _body()
-        if(body typeis String) {
-          writer.write(body)
-        } if (body typeis RawContent) {
-          writer.writeRaw(body.toString())
-        }
-        if(!Response.Committed) {
-          writer.flush()
-        }
-        return ""
+    var req = new SparkGSRequest (request)
+    var resp = new SparkGSResponse (response)
+    using (new SparkGSRequestSupport (req, resp)) {
+      var body = _body()
+      if (body typeis String) {
+        return resp.handleLayouts(body)
       }
+      if (body typeis RawContent) {
+        return body.toString();
+      }
+      return null
     }
   }
 }

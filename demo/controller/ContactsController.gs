@@ -4,36 +4,37 @@ uses sparkgs.util.IHasRequestContext
 uses sparkgs.IResourceController
 
 class ContactsController implements IHasRequestContext, IResourceController {
-  override function index() {
-    Writer.append("Index")
+
+  override function index() : String {
+    return "Index"
   }
 
-  override function _new() {
-    Writer.append("New")
+  override function _new() : String {
+    return "New"
   }
 
-  override function create() {
-    Writer.append("Create")
+  override function create()  : String{
+    return "Create"
   }
 
-  override function show(id: String) {
-    Writer.append("Show ${Params['id']}")
+  override function show(id: String)  : String{
+    return "Show"
   }
 
-  override function edit(id: String) {
-    Writer.append("Edit ${Params['id']}")
+  override function edit(id: String)  : String{
+    return "Edit"
   }
 
-  override function update(id: String) {
-    Writer.append("Update ${Params['id']}")
+  override function update(id: String)  : String{
+    return "Update"
   }
 
-  function search() {
-    Writer.append("Search")
+  function search() : String {
+    return "Search"
   }
 
-  function addresses(id : String) {
-    Writer.append("Update ${Params['id']}")
+  function addresses(id : String) : String {
+    return "Addresses"
   }
 
 }

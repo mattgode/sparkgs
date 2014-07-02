@@ -7,8 +7,10 @@ uses gw.lang.reflect.*
 uses gw.lang.reflect.gs.*
 uses gw.lang.cli.*
 uses java.io.File
+uses javax.servlet.http.HttpServletResponse
+uses spark.utils.SparkUtils
 
-abstract class SparkFile implements IHasRequestContext, IManagedProgramInstance {
+abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance {
 
   static var _staticFilesSet = false;
 
@@ -21,7 +23,7 @@ abstract class SparkFile implements IHasRequestContext, IManagedProgramInstance 
   }
 
   //===================================================================
-  //  Config Properties
+  //  Configuration Support
   //===================================================================
   property set StaticFiles(path : String) {
     if(!_staticFilesSet) {
@@ -38,75 +40,63 @@ abstract class SparkFile implements IHasRequestContext, IManagedProgramInstance 
     }
   }
 
-  property set Layout(layout : Layout) {
-    if(Response != null) {
-      Response.Writer.Layout = layout
-    } else {
-      LayoutAwareWriter.DefaultLayout = layout
-    }
-  }
-
   property set Port(port : int) {
     Spark.setPort(port)
   }
 
   //===================================================================
-  //  Routing - HTTP Verbs
+  //  Routing Support
   //===================================================================
 
   function get(path : String, handler: Object) {
-    Spark.get(new SparkRoute(path, handler))
+    Spark.get(path, new SparkGSRoute (handler))
   }
 
   function post(path : String, handler: Object ) {
-    Spark.post(new SparkRoute(path, handler))
+    Spark.post(path, new SparkGSRoute (handler))
   }
 
   function put(path : String, handler: Object ) {
-    Spark.put(new SparkRoute(path, handler))
+    Spark.put(path, new SparkGSRoute (handler))
   }
 
   function patch(path : String, handler: Object ) {
-    Spark.patch(new SparkRoute(path, handler))
+    Spark.patch(path, new SparkGSRoute (handler))
   }
 
   function delete(path : String, handler: Object ) {
-    Spark.delete(new SparkRoute(path, handler))
+    Spark.delete(path, new SparkGSRoute (handler))
   }
 
   function head(path : String, handler: Object ) {
-    Spark.head(new SparkRoute(path, handler))
+    Spark.head(path, new SparkGSRoute (handler))
   }
 
   function trace(path : String, handler: Object ) {
-    Spark.trace(new SparkRoute(path, handler))
+    Spark.trace(path, new SparkGSRoute (handler))
   }
 
   function connect(path : String, handler: Object ) {
-    Spark.connect(new SparkRoute(path, handler))
+    Spark.connect(path, new SparkGSRoute (handler))
   }
 
   function options(path : String, handler: Object ) {
-    Spark.options(new SparkRoute(path, handler))
+    Spark.options(path, new SparkGSRoute (handler))
   }
 
-  //===================================================================
-  //  Routing - Higher Level Definitions
-  //===================================================================
-
-  function handle(path: String, handler: Object, verbs : List<SparkRequest.HttpVerb> = null) {
+  function handle(path: String, handler: Object, verbs : List<SparkGSRequest.HttpVerb> = null) {
     if(verbs == null) {
-      verbs = SparkRequest.HttpVerb.AllValues
+      verbs = sparkgs.SparkGSRequest.HttpVerb.AllValues
     }
-    if(verbs.contains(SparkRequest.HttpVerb.GET)) get(path, handler)
-    if(verbs.contains(SparkRequest.HttpVerb.POST)) post(path, handler)
-    if(verbs.contains(SparkRequest.HttpVerb.PUT)) put(path, handler)
-    if(verbs.contains(SparkRequest.HttpVerb.PATCH)) patch(path, handler)
-    if(verbs.contains(SparkRequest.HttpVerb.DELETE)) delete(path, handler)
-    if(verbs.contains(SparkRequest.HttpVerb.HEAD)) head(path, handler)
-    if(verbs.contains(SparkRequest.HttpVerb.TRACE)) trace(path, handler)
-    if(verbs.contains(SparkRequest.HttpVerb.CONNECT)) connect(path, handler)
-    if(verbs.contains(SparkRequest.HttpVerb.OPTIONS)) options(path, handler)
+    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.GET)) get(path, handler)
+    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.POST)) post(path, handler)
+    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.PUT)) put(path, handler)
+    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.PATCH)) patch(path, handler)
+    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.DELETE)) delete(path, handler)
+    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.HEAD)) head(path, handler)
+    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.TRACE)) trace(path, handler)
+    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.CONNECT)) connect(path, handler)
+    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.OPTIONS)) options(path, handler)
   }
 
   function resource(path : String, controller : IResourceController) {
@@ -144,24 +134,24 @@ abstract class SparkFile implements IHasRequestContext, IManagedProgramInstance 
       var addedMethods = {}
       for(m in publicMethods) {
         if(!addedMethods.contains(m.DisplayName)) {
-          handle(path + "/" + m.DisplayName.toLowerCase(), \-> m.CallHandler.handleCall(controller, populateArgs(m.Parameters)))
+          handle(path + "/" + m.DisplayName.toLowerCase(), \-> m.CallHandler.handleCall(controller, ParamConverter.populateArgs(Params, m.Parameters)))
         } else {
-          //TODO - log method overloading warning
+          throw "Overloaded method now allowed in RPC endpoints: ${typeInfo.DisplayName}.${m.DisplayName}"
         }
       }
     }
   }
 
-  function populateArgs(params : IParameterInfo[]) : Object[] {
-    var result = new Object[params.length]
-    for(p in params index i) {
-      try {
-        result[i] = ParamConverter.convertValue(p.FeatureType, Params[p.DisplayName])
-      } catch(e) {
-        Writer.append("Bad value for param #{p.DisplayName} of type ${p.FeatureType.DisplayName} : ${Params[p.DisplayName]}")
-      }
-    }
-    return result;
+  function onException(ex : Class<Exception>, blk : block(ex:Exception, req:SparkGSRequest , resp:SparkGSResponse)) {
+    Spark.exception(ex, \ e, r, p -> blk(e, Request, Response))
+  }
+
+  function before(handler : block(req:SparkGSRequest , resp:SparkGSResponse), path : String = SparkUtils.ALL_PATHS, acceptType: String = null) {
+    Spark.before(path, acceptType, \ r, p -> handler(Request, Response))
+  }
+
+  function after(handler : block(req:SparkGSRequest , resp:SparkGSResponse), path : String = SparkUtils.ALL_PATHS, acceptType: String = null) {
+    Spark.after(path, acceptType, \ r, p -> handler(Request, Response))
   }
 
   //===================================================================

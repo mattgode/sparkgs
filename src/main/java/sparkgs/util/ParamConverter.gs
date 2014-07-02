@@ -8,6 +8,18 @@ uses java.util.*
 
 class ParamConverter {
 
+  static function populateArgs(requestValues: Map<String, String>, params : IParameterInfo[]) : Object[] {
+    var result = new Object[params.length]
+    for(p in params index i) {
+      try {
+        result[i] = ParamConverter.convertValue(p.FeatureType, requestValues[p.DisplayName])
+      } catch(e) {
+        throw "Bad value for param #{p.DisplayName} of type ${p.FeatureType.DisplayName} : ${requestValues[p.DisplayName]}"
+      }
+    }
+    return result;
+  }
+
   static function convertValue(paramType : Type, paramValue : String) : Object {
     if (paramType == boolean) {
       return "on".equals(paramValue) or "true".equals(paramValue)

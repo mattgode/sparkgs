@@ -5,19 +5,18 @@ uses controller.*
 uses view.*
 uses view.layout.*
 uses java.util.*
+uses java.lang.Exception
 
-extends sparkgs.SparkFile
+extends sparkgs.SparkGSFile
 
-// Config
+//// Config
 StaticFiles = "/public"
 Layout = AppLayout
 
-// Routes
+//// Routes
+handle("/", \-> Sample.renderToString(), :verbs = { GET, POST } )
 
-// Root example to writer
-handle("/", \-> Sample.render(Writer), :verbs = { GET, POST } )
-
-// Raw string example
+//// Raw string example
 get("/foo", "Foo!")
 
 // Post example
@@ -37,10 +36,15 @@ rpc("/rpc", new RPCExample())
 
 // Nested Layout Example
 get("/nested", \-> {
-  Writer.append("")
-  Layout = NestedLayout
-  Writer.append("asdfsadf")
+  Layouts.push(NestedLayout)
+  return "asdfsadf"
 })
+
+//// Custom Layout Example
+//get("/custom_layout", \-> {
+//  Layout = CustomLayout
+//  return "asdfsadf"
+//})
 
 // Cookie example
 get("/cookie1", \-> {
@@ -60,3 +64,8 @@ get("/fl_example", TestController#foo())
 get("/fl_static_example", TestController#staticFoo())
 get("/fl_bad", TestController#bar())
 
+// exception handling
+get("/exception", \-> { throw "Foo!" } )
+onException(Exception, \ ex, req, resp -> {
+  resp.Body = "Exception Handled!"
+})

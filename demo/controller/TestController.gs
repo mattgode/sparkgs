@@ -4,9 +4,9 @@ class TestController implements sparkgs.util.IHasRequestContext {
   
   static var counter = 0;
 
-  function foo() {
-	counter++
-    Writer.append( "Foo Foo! ${counter}" )
+  function foo() : String{
+  	counter++
+    return  "Foo Foo! ${counter}"
   }
 
   static function staticFoo() : String {

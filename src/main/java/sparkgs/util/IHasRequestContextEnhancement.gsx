@@ -16,9 +16,8 @@ enhancement IHasRequestContextEnhancement: IHasRequestContext {
     return new() {:Content = str}
   }
 
-  function json(obj : Object) : RawContent {
-    Response.Type = "application/json"
-    return raw(new Gson().toJson(obj))
+  function json(obj : Object) : Json {
+    return new() {:Content = (new Gson().toJson(obj))}
   }
 
   function halt(code = HttpServletResponse.SC_OK, message = "") {

@@ -5,6 +5,7 @@ uses java.util.Map
 uses spark.Spark
 uses javax.servlet.http.HttpServletResponse
 uses java.util.Stack
+uses com.google.gson.Gson
 
 enhancement IHasRequestContextEnhancement: IHasRequestContext {
 
@@ -13,6 +14,10 @@ enhancement IHasRequestContextEnhancement: IHasRequestContext {
    */
   function raw(str : Object) : RawContent {
     return new() {:Content = str}
+  }
+
+  function json(obj : Object) : Json {
+    return new() {:Content = (new Gson().toJson(obj))}
   }
 
   function halt(code = HttpServletResponse.SC_OK, message = "") {

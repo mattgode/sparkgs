@@ -43,6 +43,10 @@ class SparkGSRoute implements Route, IHasRequestContext {
       if (body typeis RawContent) {
         return body.toString();
       }
+      if (body typeis Json) {
+        resp.Type ="application/json"
+        return body.toString()
+      }
       return null
     }
   }

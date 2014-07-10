@@ -32,7 +32,7 @@ enhancement IHasRequestContextEnhancement: IHasRequestContext {
     return SparkGSRequestSupport.Response
   }
 
-  property get Params() : Map<String, String>  {
+  property get Params() : ParamMap  {
     return Request.Params
   }
 

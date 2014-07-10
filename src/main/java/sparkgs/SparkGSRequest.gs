@@ -18,7 +18,7 @@ class SparkGSRequest {
     OPTIONS,
   }
 
-  var _params : Map<String, String> as readonly Params
+  var _params : ParamMap as readonly Params
   var _attributes : Map<String, Object> as readonly Attributes
   var _request : Request as readonly SparkJavaRequest
   var _session : SessionMap as readonly Session

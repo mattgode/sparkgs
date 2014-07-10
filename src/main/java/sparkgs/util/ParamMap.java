@@ -39,6 +39,10 @@ public class ParamMap implements Map<String, String> {
     }
   }
 
+  public String[] all(Object key) {
+    return _req.raw().getParameterValues(key.toString());
+  }
+
   public String put(String key, String value) {
     throw new UnsupportedOperationException("Immutable map");
   }

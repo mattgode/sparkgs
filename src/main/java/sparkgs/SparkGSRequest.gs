@@ -129,4 +129,8 @@ class SparkGSRequest {
     return _request.port()
   }
 
+  property get QueryMap() : QueryParamsMap {
+    return _request.queryMap()
+  }
+
 }

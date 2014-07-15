@@ -7,7 +7,6 @@ uses gw.lang.reflect.*
 uses gw.lang.reflect.gs.*
 uses gw.lang.cli.*
 uses java.io.File
-uses javax.servlet.http.HttpServletResponse
 uses spark.utils.SparkUtils
 
 abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance {

@@ -1,8 +1,6 @@
 package sparkgs.util.inputhelper
 
 uses java.util.Map
-uses java.util.Map
-uses java.util.Map
 
 enhancement MapPutAllEnhancement : java.util.Map {
 

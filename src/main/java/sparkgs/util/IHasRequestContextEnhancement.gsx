@@ -1,7 +1,6 @@
 package sparkgs.util
 
 uses sparkgs.*
-uses java.util.Map
 uses spark.Spark
 uses javax.servlet.http.HttpServletResponse
 uses java.util.Stack

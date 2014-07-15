@@ -1,9 +1,6 @@
 package sparkgs.util.inputhelper
 
 uses java.util.Map
-uses java.util.Map
-uses java.util.Map
-uses java.util.Map
 uses java.util.ArrayList
 uses java.math.BigDecimal
 

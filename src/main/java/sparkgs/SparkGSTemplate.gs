@@ -5,6 +5,8 @@ uses java.util.Stack
 uses java.util.Map
 uses sparkgs.util.SessionMap
 uses sparkgs.util.CookieJar
+uses gw.lang.reflect.features.PropertyReference
+uses sparkgs.util.inputhelper.InputGenerator
 
 class SparkGSTemplate {
 
@@ -41,6 +43,26 @@ class SparkGSTemplate {
     } else {
       SparkGSResponse.DefaultLayout = layout
     }
+  }
+
+  static function textInput(literal: PropertyReference, name: String = null, options: Map<String, String> = null) : String {
+    return InputGenerator.textInput(literal, name ,options)
+  }
+
+  static function radioInput(literal: PropertyReference, name: String = null, options: Map<String, String> = null) : String {
+    return InputGenerator.radioInput(literal,name,options)
+  }
+
+  static function selectInput(literal: PropertyReference, name: String = null, options: Map<String, String> = null) : String {
+    return InputGenerator.selectInput(literal, name, options)
+  }
+
+  static function labelInput(literal: PropertyReference, name: String = null) : String {
+    return InputGenerator.labelInput(literal, name)
+  }
+
+  static function submitInput(text: String = 'Submit', options: Map<String, String> = null) : String {
+    return InputGenerator.submitInput(text,options)
   }
 
 }

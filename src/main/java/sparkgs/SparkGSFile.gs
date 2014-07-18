@@ -8,10 +8,12 @@ uses gw.lang.reflect.gs.*
 uses gw.lang.cli.*
 uses java.io.File
 uses spark.utils.SparkUtils
+uses java.io.Closeable
 
 abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance {
 
   static var _staticFilesSet = false;
+  static var _filterStack = new FilterStack()
 
   construct(){
     // Look for a PORT environment variable
@@ -47,39 +49,61 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
   //  Routing Support
   //===================================================================
 
+  function filter(filter : ISparkGSFilter) : Closeable {
+    _filterStack.push(filter)
+    return _filterStack
+  }
+
+  // Goes through the stack of filters as if popping them
+  private function applyFilters(path : String) {
+    for (currentFilter in _filterStack.popOrderedList()) {
+      Spark.before(path, \ r, p -> currentFilter.before(Request, Response))
+      Spark.after(path, \ r, p -> currentFilter.after(Request, Response))
+    }
+  }
+
   function get(path : String, handler: Object) {
+    applyFilters(path)
     Spark.get(path, new SparkGSRoute (handler))
   }
 
   function post(path : String, handler: Object ) {
+    applyFilters(path)
     Spark.post(path, new SparkGSRoute (handler))
   }
 
   function put(path : String, handler: Object ) {
+    applyFilters(path)
     Spark.put(path, new SparkGSRoute (handler))
   }
 
   function patch(path : String, handler: Object ) {
+    applyFilters(path)
     Spark.patch(path, new SparkGSRoute (handler))
   }
 
   function delete(path : String, handler: Object ) {
+    applyFilters(path)
     Spark.delete(path, new SparkGSRoute (handler))
   }
 
   function head(path : String, handler: Object ) {
+    applyFilters(path)
     Spark.head(path, new SparkGSRoute (handler))
   }
 
   function trace(path : String, handler: Object ) {
+    applyFilters(path)
     Spark.trace(path, new SparkGSRoute (handler))
   }
 
   function connect(path : String, handler: Object ) {
+    applyFilters(path)
     Spark.connect(path, new SparkGSRoute (handler))
   }
 
   function options(path : String, handler: Object ) {
+    applyFilters(path)
     Spark.options(path, new SparkGSRoute (handler))
   }
 

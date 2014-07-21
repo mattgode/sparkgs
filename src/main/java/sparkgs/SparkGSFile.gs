@@ -9,11 +9,12 @@ uses gw.lang.cli.*
 uses java.io.File
 uses spark.utils.SparkUtils
 uses java.io.Closeable
+uses java.util.Stack
 
 abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance {
 
   static var _staticFilesSet = false;
-  static var _filterStack = new FilterStack()
+  static var _filterStack = new Stack<ISparkGSFilter>()
 
   construct(){
     // Look for a PORT environment variable
@@ -48,19 +49,6 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
   //===================================================================
   //  Routing Support
   //===================================================================
-
-  function filter(filter : ISparkGSFilter) : Closeable {
-    _filterStack.push(filter)
-    return _filterStack
-  }
-
-  // Goes through the stack of filters as if popping them
-  private function applyFilters(path : String) {
-    for (currentFilter in _filterStack.popOrderedList()) {
-      Spark.before(path, \ r, p -> currentFilter.before(Request, Response))
-      Spark.after(path, \ r, p -> currentFilter.after(Request, Response))
-    }
-  }
 
   function get(path : String, handler: Object) {
     applyFilters(path)
@@ -167,6 +155,48 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
 
   function onException(ex : Class<Exception>, blk : block(ex:Exception, req:SparkGSRequest , resp:SparkGSResponse)) {
     Spark.exception(ex, \ e, r, p -> blk(e, Request, Response))
+  }
+
+  //===================================================================
+  // Filtering Support
+  //===================================================================
+
+  function filter(filter : ISparkGSFilter) : Closeable {
+    _filterStack.push(filter)
+    return \-> _filterStack.pop()
+  }
+
+  function filters(filters : List<ISparkGSFilter>) : Closeable {
+    filters.each(\ f -> _filterStack.push(f))
+    return \-> filters.each(\ f -> _filterStack.pop() )
+  }
+
+  function beforeFilter(blk : block(req: SparkGSRequest, resp: SparkGSResponse)) : Closeable {
+    return filter(ISparkGSFilter.wrapBefore(blk))
+  }
+
+  function beforeFilters(filters : List<block(req: SparkGSRequest, resp: SparkGSResponse)>) : Closeable {
+    filters.each(\ f -> _filterStack.push(ISparkGSFilter.wrapBefore(f)))
+    return \-> filters.each(\ f -> _filterStack.pop() )
+  }
+
+  function afterFilter(blk : block(req: SparkGSRequest, resp: SparkGSResponse)) : Closeable {
+    return filter(ISparkGSFilter.wrapAfter(blk))
+  }
+
+  function afterFilters(filters : List<block(req: SparkGSRequest, resp: SparkGSResponse)>) : Closeable {
+    filters.each(\ f -> _filterStack.push(ISparkGSFilter.wrapAfter(f)))
+    return \-> filters.each(\ f -> _filterStack.pop() )
+  }
+
+  // Telescope through the stack of filters
+  private function applyFilters(path : String) {
+    for (currentFilter in _filterStack) {
+      Spark.before(path, \ r, p -> currentFilter.before(Request, Response))
+    }
+    for (currentFilter in _filterStack.reverse()) {
+      Spark.after(path, \ r, p -> currentFilter.before(Request, Response))
+    }
   }
 
   function before(handler : block(req:SparkGSRequest , resp:SparkGSResponse), path : String = SparkUtils.ALL_PATHS, acceptType: String = null) {

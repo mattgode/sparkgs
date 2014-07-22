@@ -33,21 +33,17 @@ class SparkGSRoute implements Route, IHasRequestContext {
   }
 
   override function handle(request: Request, response: Response): String {
-    var req = new SparkGSRequest (request)
-    var resp = new SparkGSResponse (response)
-    using (new SparkGSRequestSupport (req, resp)) {
-      var body = _body()
-      if (body typeis String) {
-        return resp.handleLayouts(body)
-      }
-      if (body typeis RawContent) {
-        return body.toString();
-      }
-      if (body typeis Json) {
-        resp.Type ="application/json"
-        return body.toString()
-      }
-      return null
+    var body = _body()
+    if (body typeis String) {
+      return Response.handleLayouts(body)
     }
+    if (body typeis RawContent) {
+      return body.toString();
+    }
+    if (body typeis Json) {
+      Response.Type ="application/json"
+      return body.toString()
+    }
+    return null
   }
 }

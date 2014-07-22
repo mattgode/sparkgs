@@ -2,33 +2,29 @@ package sparkgs.util
 
 uses sparkgs.*
 uses java.lang.*
-uses java.io.Closeable
 
-class SparkGSRequestSupport implements  Closeable {
+class SparkGSRequestSupport {
 
-  var _req: SparkGSRequest as Req
-  var _res: SparkGSResponse as Resp
+  static var _REQUEST = new ThreadLocal<SparkGSRequest>()
+  static var _RESPONSE = new ThreadLocal<SparkGSResponse>()
 
-  static var _THREAD_INFO = new ThreadLocal<SparkGSRequestSupport>()
-
-  construct(req: SparkGSRequest, res: SparkGSResponse) {
-    _req = req
-    _res = res
-    _THREAD_INFO.set(this);
+  static function set(rawReq: spark.Request, rawResp: spark.Response) {
+    var req = new SparkGSRequest (rawReq)
+    var resp = new SparkGSResponse (rawResp)
+    _REQUEST.set(req);
+    _RESPONSE.set(resp);
   }
 
   static property get Request(): SparkGSRequest {
-    return _THREAD_INFO.get()?.Req
+    return _REQUEST.get()
   }
 
   static property get Response(): SparkGSResponse {
-    return _THREAD_INFO.get()?.Resp
+    return _RESPONSE.get()
   }
 
-  override function close() {
-    //TODO cgross - need a callback from sparkjava to clear this once request is really over including
-    // exception processing
-    // _THREAD_INFO.set(null)
+  static function clear() {
+    _REQUEST.set(null)
+    _RESPONSE.set(null)
   }
-
 }

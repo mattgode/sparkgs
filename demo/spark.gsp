@@ -17,7 +17,11 @@ Layout = AppLayout
 handle("/", \-> Sample.renderToString(), :verbs = { GET, POST } )
 
 //// Raw string example
-get("/foo", "Foo!")
+get("/foo", \-> "Foo! ${Params['bar']}")
+
+using(beforeFilter(\ req, resp -> print(req.IP))) {
+  get("/filtered", \-> "Foo!")
+}
 
 // Post example
 post("/post_to", \-> Params['foo'] )

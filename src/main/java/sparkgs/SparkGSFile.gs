@@ -15,6 +15,7 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
 
   static var _staticFilesSet = false;
   static var _filterStack = new Stack<ISparkGSFilter>()
+  static var _setup : block(req:spark.Request, resp:spark.Response)
 
   construct(){
     // Look for a PORT environment variable
@@ -22,6 +23,7 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
     if (port != null) {
       Port = Integer.parseInt(port)
     }
+    _setup = \req , resp -> SparkGSRequestSupport.set(req, resp)
   }
 
   //===================================================================
@@ -191,11 +193,12 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
 
   // Telescope through the stack of filters
   private function applyFilters(path : String) {
+    maybeInitRequestSetupFilter()
     for (currentFilter in _filterStack) {
       Spark.before(path, \ r, p -> currentFilter.before(Request, Response))
     }
     for (currentFilter in _filterStack.reverse()) {
-      Spark.after(path, \ r, p -> currentFilter.before(Request, Response))
+      Spark.after(path, \ r, p -> currentFilter.after(Request, Response))
     }
   }
 
@@ -212,9 +215,18 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
   //===================================================================
 
   override function afterExecution( t : Throwable ) {
+    maybeInitRequestSetupFilter()
+    Spark.after( \req, resp -> SparkGSRequestSupport.clear() )
     if(t != null) {
       print("Error when evaluating SparkFile:")
       t.printStackTrace()
+    }
+  }
+
+  function maybeInitRequestSetupFilter() {
+    if(_setup != null) {
+      Spark.before(_setup)
+      _setup = null
     }
   }
 

@@ -10,11 +10,13 @@ uses java.io.File
 uses spark.utils.SparkUtils
 uses java.io.Closeable
 uses java.util.Stack
+uses java.util.LinkedList
 
 abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance {
 
   static var _staticFilesSet = false;
   static var _filterStack = new Stack<ISparkGSFilter>()
+  static var _pathQueue = new LinkedList<String>()
   static var _setup : block(req:spark.Request, resp:spark.Response)
 
   construct(){
@@ -53,46 +55,55 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
   //===================================================================
 
   function get(path : String, handler: Object) {
+    path = nested(path)
     applyFilters(path)
-    Spark.get(path, new SparkGSRoute (handler))
+    Spark.get((path), new SparkGSRoute (handler))
   }
 
   function post(path : String, handler: Object ) {
+    path = nested(path)
     applyFilters(path)
     Spark.post(path, new SparkGSRoute (handler))
   }
 
   function put(path : String, handler: Object ) {
+    path = nested(path)
     applyFilters(path)
     Spark.put(path, new SparkGSRoute (handler))
   }
 
   function patch(path : String, handler: Object ) {
+    path = nested(path)
     applyFilters(path)
     Spark.patch(path, new SparkGSRoute (handler))
   }
 
   function delete(path : String, handler: Object ) {
+    path = nested(path)
     applyFilters(path)
     Spark.delete(path, new SparkGSRoute (handler))
   }
 
   function head(path : String, handler: Object ) {
+    path = nested(path)
     applyFilters(path)
     Spark.head(path, new SparkGSRoute (handler))
   }
 
   function trace(path : String, handler: Object ) {
+    path = nested(path)
     applyFilters(path)
     Spark.trace(path, new SparkGSRoute (handler))
   }
 
   function connect(path : String, handler: Object ) {
+    path = nested(path)
     applyFilters(path)
     Spark.connect(path, new SparkGSRoute (handler))
   }
 
   function options(path : String, handler: Object ) {
+    path = nested(path)
     applyFilters(path)
     Spark.options(path, new SparkGSRoute (handler))
   }
@@ -157,6 +168,24 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
 
   function onException(ex : Class<Exception>, blk : block(ex:Exception, req:SparkGSRequest , resp:SparkGSResponse)) {
     Spark.exception(ex, \ e, r, p -> blk(e, Request, Response))
+  }
+
+  //===================================================================
+  // Nested Path Support
+  //===================================================================
+
+  function path(path : String) : Closeable {
+    _pathQueue.add(path)
+    return \-> _pathQueue.remove()
+  }
+
+  private function nested(original : String) : String {
+    var newPath = new StringBuffer()
+    for (path in _pathQueue) {
+      newPath.append(path)
+    }
+    newPath.append(original)
+    return newPath.toString()
   }
 
   //===================================================================

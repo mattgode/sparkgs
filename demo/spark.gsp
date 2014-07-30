@@ -23,6 +23,15 @@ using(beforeFilter(\ req, resp -> print(req.IP))) {
   get("/filtered", \-> "Foo!")
 }
 
+//Nested Routing Example
+using(path('/foo')) {
+  using(path('/bar')) {
+    using(path('/fizz')) {
+      get('/buzz', \ -> 'Foo. Bar. Fizz. Buzz.')
+    }
+  }
+}
+
 // Post example
 post("/post_to", \-> Params['foo'] )
 

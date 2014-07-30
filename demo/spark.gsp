@@ -6,6 +6,7 @@ uses view.*
 uses view.layout.*
 uses java.util.*
 uses java.lang.Exception
+uses sparkgs.SparkGSRequest
 
 extends sparkgs.SparkGSFile
 
@@ -25,7 +26,7 @@ using(beforeFilter(\ req, resp -> print(req.IP))) {
 
 //Nested Routing Example
 using(path('/foo')) {
-  using(path('/bar')) {
+  using(path('/bar', {SparkGSRequest.HttpVerb.GET -> \-> 'MyBlock'})) {
     using(path('/fizz')) {
       get('/buzz', \ -> 'Foo. Bar. Fizz. Buzz.')
     }

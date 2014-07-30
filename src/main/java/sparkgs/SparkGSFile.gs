@@ -11,6 +11,7 @@ uses spark.utils.SparkUtils
 uses java.io.Closeable
 uses java.util.Stack
 uses java.util.LinkedList
+uses java.util.Map
 
 abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance {
 
@@ -174,9 +175,16 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
   // Nested Path Support
   //===================================================================
 
-  function path(path : String) : Closeable {
+  function path(path : String, routes : Map<SparkGSRequest.HttpVerb,Object> = null) : Closeable {
+    routeRoot(path, routes)
     _pathQueue.add(path)
     return \-> _pathQueue.remove()
+  }
+
+  private function routeRoot(path : String, routes : Map<SparkGSRequest.HttpVerb, Object>) {
+    for (route in routes?.entrySet()) {
+      handle(path, route.Value, {route.Key})
+    }
   }
 
   private function nested(original : String) : String {

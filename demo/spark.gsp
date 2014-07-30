@@ -18,20 +18,22 @@ Layout = AppLayout
 handle("/", \-> Sample.renderToString(), :verbs = { GET, POST } )
 
 //// Raw string example
-get("/foo", \-> "Foo! ${Params['bar']}")
+//get("/foo", \-> "Foo! ${Params['bar']}")
 
 using(beforeFilter(\ req, resp -> print(req.IP))) {
   get("/filtered", \-> "Foo!")
 }
 
 //Nested Routing Example
-using(path('/foo')) {
-  using(path('/bar', {SparkGSRequest.HttpVerb.GET -> \-> 'MyBlock'})) {
-    using(path('/fizz')) {
-      get('/buzz', \ -> 'Foo. Bar. Fizz. Buzz.')
+get('/foo', \-> 'bar', \-> {
+  using(path('/foo')) {
+    using(path('/bar')) {
+      using(path('/fizz')) {
+        get('/buzz', \ -> 'Foo. Bar. Fizz. Buzz.')
+      }
     }
   }
-}
+})
 
 // Post example
 post("/post_to", \-> Params['foo'] )

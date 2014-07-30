@@ -55,58 +55,67 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
   //  Routing Support
   //===================================================================
 
-  function get(path : String, handler: Object) {
+  function get(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
     Spark.get((path), new SparkGSRoute (handler))
+    handleRoutes(path, routes)
   }
 
-  function post(path : String, handler: Object ) {
+  function post(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
     Spark.post(path, new SparkGSRoute (handler))
+    handleRoutes(path, routes)
   }
 
-  function put(path : String, handler: Object ) {
+  function put(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
     Spark.put(path, new SparkGSRoute (handler))
+    handleRoutes(path, routes)
   }
 
-  function patch(path : String, handler: Object ) {
+  function patch(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
     Spark.patch(path, new SparkGSRoute (handler))
+    handleRoutes(path, routes)
   }
 
-  function delete(path : String, handler: Object ) {
+  function delete(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
     Spark.delete(path, new SparkGSRoute (handler))
+    handleRoutes(path, routes)
   }
 
-  function head(path : String, handler: Object ) {
+  function head(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
     Spark.head(path, new SparkGSRoute (handler))
+    handleRoutes(path, routes)
   }
 
-  function trace(path : String, handler: Object ) {
+  function trace(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
     Spark.trace(path, new SparkGSRoute (handler))
+    handleRoutes(path, routes)
   }
 
-  function connect(path : String, handler: Object ) {
+  function connect(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
     Spark.connect(path, new SparkGSRoute (handler))
+    handleRoutes(path, routes)
   }
 
-  function options(path : String, handler: Object ) {
+  function options(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
     Spark.options(path, new SparkGSRoute (handler))
+    handleRoutes(path, routes)
   }
 
   function handle(path: String, handler: Object, verbs : List<SparkGSRequest.HttpVerb> = null) {
@@ -175,16 +184,15 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
   // Nested Path Support
   //===================================================================
 
-  function path(path : String, routes : Map<SparkGSRequest.HttpVerb,Object> = null) : Closeable {
-    routeRoot(path, routes)
+  function path(path : String) : Closeable {
     _pathQueue.add(path)
     return \-> _pathQueue.remove()
   }
 
-  private function routeRoot(path : String, routes : Map<SparkGSRequest.HttpVerb, Object>) {
-    for (route in routes?.entrySet()) {
-      handle(path, route.Value, {route.Key})
-    }
+  private function handleRoutes(path : String, routes : block()) {
+    _pathQueue.add(path)
+    if (routes != null) routes()
+    _pathQueue.pop()
   }
 
   private function nested(original : String) : String {

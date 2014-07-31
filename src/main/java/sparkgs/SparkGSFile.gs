@@ -10,6 +10,7 @@ uses java.io.File
 uses spark.utils.SparkUtils
 uses java.io.Closeable
 uses java.util.Stack
+uses org.slf4j.LoggerFactory
 
 abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance {
 
@@ -200,6 +201,10 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
     for (currentFilter in _filterStack.reverse()) {
       Spark.after(path, \ r, p -> currentFilter.after(Request, Response))
     }
+  }
+
+  function logRequests() : Closeable {
+    return filter(new RequestLogFilter())
   }
 
   function before(handler : block(req:SparkGSRequest , resp:SparkGSResponse), path : String = SparkUtils.ALL_PATHS, acceptType: String = null) {

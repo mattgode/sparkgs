@@ -68,10 +68,10 @@ get("/fl_example", TestController#foo())
 get("/fl_static_example", TestController#staticFoo())
 get("/fl_bad", TestController#bar())
 
-// Log Requests Example
-using(logRequests()) {
-  get("/logged", \-> "Request log example. ${Params['bar']}")
-}
+get("/log_info", \-> {
+  logInfo(Request.SparkJavaRequest.queryString());
+  return "${Params['bar']}"
+})
 
 // exception handling
 get("/exception", \-> { throw "Foo!" } )

@@ -20,7 +20,7 @@
       <% for(timer in MetricsFilter.Metrics.Timers.entrySet())  {%>
       <tr>
         <td>
-          ${timer.Key.replace(MetricsFilter.TimerDelimiter, '')}
+          <a href='metering/${java.net.URLEncoder.encode(timer.Key, 'UTF-8')}'>${timer.Key.replace(MetricsFilter.TimerDelimiter, '')}</a>
         </td>
         <td>
           ${timer.Value.Count}

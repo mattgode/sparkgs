@@ -11,7 +11,7 @@ uses spark.utils.SparkUtils
 uses java.io.Closeable
 uses java.util.Stack
 uses java.util.LinkedList
-uses sparkgs.util.metering.*
+uses sparkgs.util.metrics.*
 
 abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance {
 
@@ -256,7 +256,7 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
   }
 
   function metering() : Closeable {
-    get('/metering', \ -> MetricsView.renderToString())
+    resource('/metering', new MetricsController ())
     return filter(new MetricsFilter())
   }
 

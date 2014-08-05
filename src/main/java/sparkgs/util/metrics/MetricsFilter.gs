@@ -1,4 +1,4 @@
-package sparkgs.util.metering
+package sparkgs.util.metrics
 
 uses sparkgs.ISparkGSFilter
 uses com.codahale.metrics.MetricRegistry

@@ -6,6 +6,7 @@ uses view.*
 uses view.layout.*
 uses java.util.*
 uses java.lang.Exception
+uses java.lang.System
 
 extends sparkgs.SparkGSFile
 
@@ -71,6 +72,16 @@ get("/fl_bad", TestController#bar())
 get("/log_info", \-> {
   logInfo(Request.SparkJavaRequest.queryString());
   return "${Params['bar']}"
+})
+
+get("/trace_example", \-> {
+  Request.pushToTrace()
+  Request.pushToTrace()
+  Request.printTrace()
+
+  Request.popFromTrace()
+  Request.printTrace()
+  return "Check out your console!"
 })
 
 // exception handling

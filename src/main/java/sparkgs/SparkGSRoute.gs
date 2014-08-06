@@ -4,6 +4,7 @@ uses spark.*
 uses sparkgs.util.*
 uses gw.lang.function.IBlock
 uses gw.lang.reflect.features.*
+uses java.lang.System
 
 class SparkGSRoute implements Route, IHasRequestContext {
 
@@ -32,18 +33,24 @@ class SparkGSRoute implements Route, IHasRequestContext {
     }
   }
 
-  override function handle(request: Request, response: Response): String {
-    var body = _body()
-    if (body typeis String) {
-      return Response.handleLayouts(body)
+  override function handle(r: Request, p: Response): String {
+    var start = System.currentTimeMillis()
+    logInfo( \-> "Started ${Request.Method} ${Request.PathInfo}")
+    try {
+      var body = _body()
+      if (body typeis String) {
+        return Response.handleLayouts(body)
+      }
+      if (body typeis RawContent) {
+        return body.toString();
+      }
+      if (body typeis Json) {
+        Response.Type ="application/json"
+        return body.toString()
+      }
+      return null
+    } finally {
+      logInfo( \-> "Finished ${Request.Method} ${Request.PathInfo} in ${System.currentTimeMillis() - start}ms")
     }
-    if (body typeis RawContent) {
-      return body.toString();
-    }
-    if (body typeis Json) {
-      Response.Type ="application/json"
-      return body.toString()
-    }
-    return null
   }
 }

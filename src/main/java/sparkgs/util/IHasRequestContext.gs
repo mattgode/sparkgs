@@ -1,5 +1,5 @@
 package sparkgs.util
 
-interface IHasRequestContext {
+interface IHasRequestContext extends IHasRequestLog {
   /* Mixin Interface for IHasRequestContextEnhancement */
 }

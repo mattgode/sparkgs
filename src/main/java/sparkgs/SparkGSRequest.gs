@@ -20,6 +20,7 @@ class SparkGSRequest {
     OPTIONS,
   }
 
+  var _id : String as RequestID =  UUID.randomUUID().toString()
   var _params : ParamMap as readonly Params
   var _attributes : Map<String, Object> as readonly Attributes
   var _request : Request as readonly SparkJavaRequest
@@ -36,7 +37,7 @@ class SparkGSRequest {
   }
 
   //----------------------------------------------------------------------
-  // HTTP Verb Helpers
+  // HTTP Method Helpers
   //----------------------------------------------------------------------
   property get IsGet() : boolean {
     return _request.requestMethod().equalsIgnoreCase(HttpVerb.GET.toString())
@@ -72,6 +73,10 @@ class SparkGSRequest {
 
   property get IsOptions() : boolean {
     return _request.requestMethod().equalsIgnoreCase(HttpVerb.OPTIONS.toString())
+  }
+
+  property get Method() : String {
+    return _request.requestMethod()
   }
 
   //----------------------------------------------------------------------

@@ -78,10 +78,15 @@ using(metering()) {
   get("/fl_bad", TestController#bar())
   
   get("/log_info", \-> {
-    logInfo(Request.SparkJavaRequest.queryString());
+    logInfo(Request.SparkJavaRequest.queryString())
     return "${Params['bar']}"
   })
   
+  get("/log_info_w_block", \-> {
+    logInfo(\-> "A Block Log Message!")
+    return "${Params['bar']}"
+  })
+
   get("/trace_example", \-> {
     Request.pushToTrace()
     Request.pushToTrace()

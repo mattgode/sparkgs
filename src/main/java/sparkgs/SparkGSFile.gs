@@ -13,7 +13,7 @@ uses java.util.Stack
 uses java.util.LinkedList
 uses sparkgs.util.metrics.*
 
-abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance, IHasRequestLog {
+abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance {
 
   static var _staticFilesSet = false;
   static var _filterStack = new Stack<ISparkGSFilter>()

@@ -122,17 +122,17 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
 
   function handle(path: String, handler: Object, verbs : List<SparkGSRequest.HttpVerb> = null) {
     if(verbs == null) {
-      verbs = sparkgs.SparkGSRequest.HttpVerb.AllValues
+      verbs = SparkGSRequest.HttpVerb.AllValues
     }
-    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.GET)) get(path, handler)
-    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.POST)) post(path, handler)
-    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.PUT)) put(path, handler)
-    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.PATCH)) patch(path, handler)
-    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.DELETE)) delete(path, handler)
-    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.HEAD)) head(path, handler)
-    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.TRACE)) trace(path, handler)
-    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.CONNECT)) connect(path, handler)
-    if(verbs.contains(sparkgs.SparkGSRequest.HttpVerb.OPTIONS)) options(path, handler)
+    if(verbs.contains(SparkGSRequest.HttpVerb.GET)) get(path, handler)
+    if(verbs.contains(SparkGSRequest.HttpVerb.POST)) post(path, handler)
+    if(verbs.contains(SparkGSRequest.HttpVerb.PUT)) put(path, handler)
+    if(verbs.contains(SparkGSRequest.HttpVerb.PATCH)) patch(path, handler)
+    if(verbs.contains(SparkGSRequest.HttpVerb.DELETE)) delete(path, handler)
+    if(verbs.contains(SparkGSRequest.HttpVerb.HEAD)) head(path, handler)
+    if(verbs.contains(SparkGSRequest.HttpVerb.TRACE)) trace(path, handler)
+    if(verbs.contains(SparkGSRequest.HttpVerb.CONNECT)) connect(path, handler)
+    if(verbs.contains(SparkGSRequest.HttpVerb.OPTIONS)) options(path, handler)
   }
 
   function resource(path : String, controller : IResourceController) {

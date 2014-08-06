@@ -6,6 +6,7 @@ uses view.*
 uses view.layout.*
 uses java.util.*
 uses java.lang.Exception
+uses sparkgs.SparkGSRequest
 
 extends sparkgs.SparkGSFile
 
@@ -13,63 +14,74 @@ extends sparkgs.SparkGSFile
 StaticFiles = "/public"
 Layout = AppLayout
 
-//// Routes
-handle("/", \-> Sample.renderToString(), :verbs = { GET, POST } )
+using(metering()) {
+  //// Routes
+  handle("/", \-> Sample.renderToString(), :verbs = { GET, POST } )
 
-//// Raw string example
-get("/foo", \-> "Foo! ${Params['bar']}")
+  using(beforeFilter(\ req, resp -> print(req.IP))) {
+    get("/filtered", \-> "Foo!")
+  }
 
-using(beforeFilter(\ req, resp -> print(req.IP))) {
-  get("/filtered", \-> "Foo!")
+  //Nested Routing Example
+  get('/foo', \-> "Foo! ${Params['bar']}", \-> {
+    using(path('/foo')) {
+      using(path('/bar')) {
+        using(path('/fizz')) {
+          get('/buzz', \ -> 'Foo. Bar. Fizz. Buzz.')
+        }
+      }
+    }
+  })
+
+  // Post example
+  post("/post_to", \-> Params['foo'] )
+
+  // Handle example
+  handle("/handle", \-> Request.IsGet )
+
+  // Redirect example
+  get("/redirect", \-> redirect("/foo") )
+
+  // REST-ful resource example
+  resource("/contacts", new ContactsController())
+
+  // RPC Example
+  rpc("/rpc", new RPCExample())
+
+  // Nested Layout Example
+  get("/nested", \-> {
+    Layouts.push(NestedLayout)
+    return "asdfsadf"
+  })
+
+  //// Custom Layout Example
+  //get("/custom_layout", \-> {
+  //  Layout = CustomLayout
+  //  return "asdfsadf"
+  //})
+
+  // Cookie example
+  get("/cookie1", \-> {
+    Cookies["Foo"] =  UUID.randomUUID().toString()
+    redirect("/cookie2")
+  })
+  get("/cookie2", \-> Cookies["Foo"] )
+
+  // Header example
+  get("/header", \-> {
+    Headers["X-Foo"] = "Bar"
+    return "derp"
+  })
+
+  // Feature Literal Examples
+  get("/fl_example", TestController#foo())
+  get("/fl_static_example", TestController#staticFoo())
+  get("/fl_bad", TestController#bar())
+
+  // exception handling
+  get("/exception", \-> { throw "Foo!" } )
+  onException(Exception, \ ex, req, resp -> {
+    ex.printStackTrace()
+    resp.Body = "Exception Handled! + ${ex.Message}"
+  })
 }
-
-// Post example
-post("/post_to", \-> Params['foo'] )
-
-// Handle example
-handle("/handle", \-> Request.IsGet )
-
-// Redirect example
-get("/redirect", \-> redirect("/foo") )
-
-// REST-ful resource example
-resource("/contacts", new ContactsController())
-
-// RPC Example
-rpc("/rpc", new RPCExample())
-
-// Nested Layout Example
-get("/nested", \-> {
-  Layouts.push(NestedLayout)
-  return "asdfsadf"
-})
-
-//// Custom Layout Example
-//get("/custom_layout", \-> {
-//  Layout = CustomLayout
-//  return "asdfsadf"
-//})
-
-// Cookie example
-get("/cookie1", \-> {
-  Cookies["Foo"] =  UUID.randomUUID().toString()
-  redirect("/cookie2")
-})
-get("/cookie2", \-> Cookies["Foo"] )
-
-// Header example
-get("/header", \-> {
-  Headers["X-Foo"] = "Bar"
-  return "derp"
-})
-
-// Feature Literal Examples
-get("/fl_example", TestController#foo())
-get("/fl_static_example", TestController#staticFoo())
-get("/fl_bad", TestController#bar())
-
-// exception handling
-get("/exception", \-> { throw "Foo!" } )
-onException(Exception, \ ex, req, resp -> {
-  resp.Body = "Exception Handled!"
-})

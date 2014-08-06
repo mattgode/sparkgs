@@ -6,7 +6,6 @@ uses view.*
 uses view.layout.*
 uses java.util.*
 uses java.lang.Exception
-uses sparkgs.SparkGSRequest
 
 extends sparkgs.SparkGSFile
 
@@ -77,6 +76,21 @@ using(metering()) {
   get("/fl_example", TestController#foo())
   get("/fl_static_example", TestController#staticFoo())
   get("/fl_bad", TestController#bar())
+  
+  get("/log_info", \-> {
+    logInfo(Request.SparkJavaRequest.queryString());
+    return "${Params['bar']}"
+  })
+  
+  get("/trace_example", \-> {
+    Request.pushToTrace()
+    Request.pushToTrace()
+    Request.printTrace()
+  
+    Request.popFromTrace()
+    Request.printTrace()
+    return "Check out your console!"
+  })
 
   // exception handling
   get("/exception", \-> { throw "Foo!" } )

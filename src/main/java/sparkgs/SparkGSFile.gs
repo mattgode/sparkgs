@@ -13,7 +13,7 @@ uses java.util.Stack
 uses java.util.LinkedList
 uses sparkgs.util.metrics.*
 
-abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance {
+abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance, IHasRequestLog {
 
   static var _staticFilesSet = false;
   static var _filterStack = new Stack<ISparkGSFilter>()
@@ -246,6 +246,7 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
       Spark.after(path, \ r, p -> currentFilter.after(Request, Response))
     }
   }
+
 
   function before(handler : block(req:SparkGSRequest , resp:SparkGSResponse), path : String = SparkUtils.ALL_PATHS, acceptType: String = null) {
     Spark.before(path, acceptType, \ r, p -> handler(Request, Response))

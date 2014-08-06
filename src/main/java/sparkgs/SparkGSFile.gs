@@ -12,12 +12,14 @@ uses java.io.Closeable
 uses java.util.Stack
 uses java.util.LinkedList
 uses sparkgs.util.metrics.*
+uses com.codahale.metrics.MetricRegistry
 
 abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstance {
 
   static var _staticFilesSet = false;
   static var _filterStack = new Stack<ISparkGSFilter>()
   static var _pathQueue = new LinkedList<String>()
+  static var _metricsStack : Stack<MetricRegistry> as MetricsStack = new()
   static var _setup : block(req:spark.Request, resp:spark.Response)
 
   construct(){
@@ -58,63 +60,63 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
   function get(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.get((path), new SparkGSRoute (handler))
+    Spark.get((path), new SparkGSRoute (handler, path))
     handleRoutes(path, routes)
   }
 
   function post(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.post(path, new SparkGSRoute (handler))
+    Spark.post(path, new SparkGSRoute (handler, path))
     handleRoutes(path, routes)
   }
 
   function put(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.put(path, new SparkGSRoute (handler))
+    Spark.put(path, new SparkGSRoute (handler, path))
     handleRoutes(path, routes)
   }
 
   function patch(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.patch(path, new SparkGSRoute (handler))
+    Spark.patch(path, new SparkGSRoute (handler, path))
     handleRoutes(path, routes)
   }
 
   function delete(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.delete(path, new SparkGSRoute (handler))
+    Spark.delete(path, new SparkGSRoute (handler, path))
     handleRoutes(path, routes)
   }
 
   function head(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.head(path, new SparkGSRoute (handler))
+    Spark.head(path, new SparkGSRoute (handler, path))
     handleRoutes(path, routes)
   }
 
   function trace(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.trace(path, new SparkGSRoute (handler))
+    Spark.trace(path, new SparkGSRoute (handler, path))
     handleRoutes(path, routes)
   }
 
   function connect(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.connect(path, new SparkGSRoute (handler))
+    Spark.connect(path, new SparkGSRoute (handler, path))
     handleRoutes(path, routes)
   }
 
   function options(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.options(path, new SparkGSRoute (handler))
+    Spark.options(path, new SparkGSRoute (handler, path))
     handleRoutes(path, routes)
   }
 
@@ -255,9 +257,10 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
     Spark.after(path, acceptType, \ r, p -> handler(Request, Response))
   }
 
-  function metering() : Closeable {
-    resource('/metering', new MetricsController ())
-    return filter(new MetricsFilter())
+  function metering(path : String = null) : Closeable {
+    var controller = new MetricsController(path ?: '/metering')
+    resource(path ?: '/metering', controller)
+    return filter(controller.Filter)
   }
 
   //===================================================================

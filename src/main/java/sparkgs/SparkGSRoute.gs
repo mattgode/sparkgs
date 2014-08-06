@@ -4,12 +4,15 @@ uses spark.*
 uses sparkgs.util.*
 uses gw.lang.function.IBlock
 uses gw.lang.reflect.features.*
+uses sparkgs.util.metrics.MetricsRunner
 
 class SparkGSRoute implements Route, IHasRequestContext {
 
   var _body():Object
+  var _route : String
 
-  construct(handler: Object) {
+  construct(handler: Object, route : String) {
+    _route = route
     if(handler typeis IBlock) {
       _body = \-> handler.invokeWithArgs({})
     } else if(handler typeis IMethodReference) {
@@ -33,17 +36,19 @@ class SparkGSRoute implements Route, IHasRequestContext {
   }
 
   override function handle(request: Request, response: Response): String {
-    var body = _body()
-    if (body typeis String) {
-      return Response.handleLayouts(body)
+    using(MetricsRunner.time(_route, request.requestMethod())) {
+      var body = _body()
+      if (body typeis String) {
+        return Response.handleLayouts(body)
+      }
+      if (body typeis RawContent) {
+        return body.toString();
+      }
+      if (body typeis Json) {
+        Response.Type ="application/json"
+        return body.toString()
+      }
+      return null
     }
-    if (body typeis RawContent) {
-      return body.toString();
-    }
-    if (body typeis Json) {
-      Response.Type ="application/json"
-      return body.toString()
-    }
-    return null
   }
 }

@@ -60,63 +60,63 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
   function get(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.get((path), new SparkGSRoute (handler, path))
+    Spark.get((path), new SparkGSRoute(handler, path))
     handleRoutes(path, routes)
   }
 
   function post(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.post(path, new SparkGSRoute (handler, path))
+    Spark.post(path, new SparkGSRoute(handler, path))
     handleRoutes(path, routes)
   }
 
   function put(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.put(path, new SparkGSRoute (handler, path))
+    Spark.put(path, new SparkGSRoute(handler, path))
     handleRoutes(path, routes)
   }
 
   function patch(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.patch(path, new SparkGSRoute (handler, path))
+    Spark.patch(path, new SparkGSRoute(handler, path))
     handleRoutes(path, routes)
   }
 
   function delete(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.delete(path, new SparkGSRoute (handler, path))
+    Spark.delete(path, new SparkGSRoute(handler, path))
     handleRoutes(path, routes)
   }
 
   function head(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.head(path, new SparkGSRoute (handler, path))
+    Spark.head(path, new SparkGSRoute(handler, path))
     handleRoutes(path, routes)
   }
 
   function trace(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.trace(path, new SparkGSRoute (handler, path))
+    Spark.trace(path, new SparkGSRoute(handler, path))
     handleRoutes(path, routes)
   }
 
   function connect(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.connect(path, new SparkGSRoute (handler, path))
+    Spark.connect(path, new SparkGSRoute(handler, path))
     handleRoutes(path, routes)
   }
 
   function options(path : String, handler: Object, routes : block() = null) {
     path = nested(path)
     applyFilters(path)
-    Spark.options(path, new SparkGSRoute (handler, path))
+    Spark.options(path, new SparkGSRoute(handler, path))
     handleRoutes(path, routes)
   }
 
@@ -248,6 +248,7 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
       Spark.after(path, \ r, p -> currentFilter.after(Request, Response))
     }
   }
+
 
   function before(handler : block(req:SparkGSRequest , resp:SparkGSResponse), path : String = SparkUtils.ALL_PATHS, acceptType: String = null) {
     Spark.before(path, acceptType, \ r, p -> handler(Request, Response))

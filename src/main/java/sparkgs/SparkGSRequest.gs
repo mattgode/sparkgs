@@ -3,6 +3,8 @@ package sparkgs
 uses java.util.*
 uses spark.*
 uses sparkgs.util.*
+uses java.lang.StringBuilder
+uses java.lang.System
 
 class SparkGSRequest {
 
@@ -18,20 +20,24 @@ class SparkGSRequest {
     OPTIONS,
   }
 
+  var _id : String as RequestID =  UUID.randomUUID().toString()
   var _params : ParamMap as readonly Params
   var _attributes : Map<String, Object> as readonly Attributes
   var _request : Request as readonly SparkJavaRequest
   var _session : SessionMap as readonly Session
+  var _traceStack : Stack<TraceComponent>
 
   construct(request:Request) {
     _request = request;
     _params = new ParamMap(SparkJavaRequest)
     _attributes = new AttributesMap(SparkJavaRequest)
     _session = new SessionMap(SparkJavaRequest)
+    _traceStack = new Stack<TraceComponent>()
+    _traceStack.push(new TraceComponent("Request:   "+request.servletPath()))
   }
 
   //----------------------------------------------------------------------
-  // HTTP Verb Helpers
+  // HTTP Method Helpers
   //----------------------------------------------------------------------
   property get IsGet() : boolean {
     return _request.requestMethod().equalsIgnoreCase(HttpVerb.GET.toString())
@@ -67,6 +73,10 @@ class SparkGSRequest {
 
   property get IsOptions() : boolean {
     return _request.requestMethod().equalsIgnoreCase(HttpVerb.OPTIONS.toString())
+  }
+
+  property get Method() : String {
+    return _request.requestMethod()
   }
 
   //----------------------------------------------------------------------
@@ -132,5 +142,30 @@ class SparkGSRequest {
   property get QueryMap() : QueryParamsMap {
     return _request.queryMap()
   }
+
+  //----------------------------------------------------------------------
+  // Tracing Support
+  //----------------------------------------------------------------------
+
+  function pushToTrace(name : String = null) {
+    if (name == null) name = "-Section " + _traceStack.size() + ":"
+    _traceStack.push(new TraceComponent(name))
+  }
+
+
+  function popFromTrace() : TraceComponent {
+    return _traceStack.pop()
+  }
+
+
+  function printTrace() {
+    var s = new StringBuilder()
+    for (e in _traceStack index i) {
+      var time = (System.nanoTime() - e.startTime) as double / 1000000
+      s.append(e.name + " ["+time+" ms]\n")
+    }
+    print(s)
+  }
+
 
 }

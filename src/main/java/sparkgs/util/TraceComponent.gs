@@ -3,16 +3,19 @@ package sparkgs.util
 uses java.lang.System
 
 class TraceComponent {
+
   var _name : String
-  var _startTime : long
+  var _depth : long as readonly Depth
+  var _start : long as readonly Start
+  var _end : long as readonly End
 
   construct(componentName : String) {
-    _startTime = System.nanoTime()
+    _start = System.nanoTime()
     _name = componentName
   }
 
-  property get startTime() : long {
-    return _startTime
+  property get Start() : long {
+    return _start
   }
 
   property get name() : String {

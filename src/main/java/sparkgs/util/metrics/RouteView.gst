@@ -1,5 +1,5 @@
-<%@ params(id : String) %>
-<% var timer = MetricsFilter.Metrics.timer(id) %>
+<%@ params(filter : MetricsFilter, id : String) %>
+<% var timer = filter.Metrics.timer(id) %>
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="http://code.highcharts.com/highcharts-more.js"></script>
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
@@ -42,7 +42,7 @@
     <tbody>
       <tr>
         <td>
-          ${id.replace(MetricsFilter.TimerDelimiter, '')}
+          ${id.replace(MetricsRunner.TimerDelimiter, '')}
         </td>
         <td>
           ${timer.Count}

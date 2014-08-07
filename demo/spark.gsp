@@ -6,6 +6,8 @@ uses view.*
 uses view.layout.*
 uses java.util.*
 uses java.lang.Exception
+uses sparkgs.SparkGSRequest
+uses java.lang.Thread
 
 extends sparkgs.SparkGSFile
 
@@ -14,6 +16,7 @@ StaticFiles = "/public"
 Layout = AppLayout
 
 using(metering()) {
+
   //// Routes
   handle("/", \-> Sample.renderToString(), :verbs = { GET, POST } )
 
@@ -23,14 +26,16 @@ using(metering()) {
 
   //Nested Routing Example
   get('/foo', \-> "Foo! ${Params['bar']}", \-> {
-    using(path('/foo')) {
-      using(path('/bar')) {
-        using(path('/fizz')) {
-          get('/buzz', \ -> 'Foo. Bar. Fizz. Buzz.')
-        }
-      }
+    using(path('/fizz')) {
+      get('/buzz', \ -> 'Foo. Bar. Fizz. Buzz.')
     }
   })
+
+  using(metering('/metering_selective')) {
+    get('/selective', \ -> 'Check out the page at /metering_selective')
+  }
+
+  get('/custom/:id/ids', \ -> {Thread.sleep(700) return Params['id']})
 
   // Post example
   post("/post_to", \-> Params['foo'] )
@@ -52,12 +57,6 @@ using(metering()) {
     Layouts.push(NestedLayout)
     return "asdfsadf"
   })
-
-  //// Custom Layout Example
-  //get("/custom_layout", \-> {
-  //  Layout = CustomLayout
-  //  return "asdfsadf"
-  //})
 
   // Cookie example
   get("/cookie1", \-> {

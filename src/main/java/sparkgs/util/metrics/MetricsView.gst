@@ -1,3 +1,4 @@
+<%@ params(filter : MetricsFilter, route : String) %>
 <div>
   <h2 class="page-title">Results</h2>
 </div>
@@ -17,10 +18,10 @@
       </tr>
     </thead>
     <tbody>
-      <% for(timer in MetricsFilter.Metrics.Timers.entrySet())  {%>
+      <% for(timer in filter.Metrics.Timers.entrySet())  {%>
       <tr>
         <td>
-          <a href='metering/${java.net.URLEncoder.encode(timer.Key, 'UTF-8')}'>${timer.Key.replace(MetricsFilter.TimerDelimiter, '')}</a>
+          <a href='${route}/${java.net.URLEncoder.encode(timer.Key, 'UTF-8')}'>${timer.Key.replace(MetricsRunner.TimerDelimiter, '')}</a>
         </td>
         <td>
           ${timer.Value.Count}

@@ -51,6 +51,7 @@ class SparkGSRoute implements Route, IHasRequestContext {
       return null
     } finally {
       logInfo( \-> "Finished ${Request.Method} ${Request.PathInfo} in ${System.currentTimeMillis() - start}ms")
+      logInfo( "Trace for ${Request.Method} ${Request.PathInfo}")
     }
   }
 }

@@ -5,8 +5,9 @@ uses spark.*
 uses sparkgs.util.*
 uses java.lang.StringBuilder
 uses java.lang.System
+uses java.io.Closeable
 
-class SparkGSRequest {
+class SparkGSRequest implements IHasRequestLog {
 
   enum HttpVerb {
     GET,
@@ -33,7 +34,6 @@ class SparkGSRequest {
     _attributes = new AttributesMap(SparkJavaRequest)
     _session = new SessionMap(SparkJavaRequest)
     _traceStack = new Stack<TraceComponent>()
-    _traceStack.push(new TraceComponent("Request:   "+request.servletPath()))
   }
 
   //----------------------------------------------------------------------
@@ -147,24 +147,30 @@ class SparkGSRequest {
   // Tracing Support
   //----------------------------------------------------------------------
 
+  function popFromTrace() {
+    var popTime = System.nanoTime()
+
+
+    for (e in _traceStack) {
+      var time = (popTime - e.startTime) as double / 1000000
+      logInfo(e.name + " ["+ time + " ms]")
+    }
+  }
+
   function pushToTrace(name : String = null) {
     if (name == null) name = "-Section " + _traceStack.size() + ":"
     _traceStack.push(new TraceComponent(name))
   }
 
 
-  function popFromTrace() : TraceComponent {
-    return _traceStack.pop()
-  }
 
-
-  function printTrace() {
+  function printTrace() : String {
     var s = new StringBuilder()
     for (e in _traceStack index i) {
       var time = (System.nanoTime() - e.startTime) as double / 1000000
       s.append(e.name + " ["+time+" ms]\n")
     }
-    print(s)
+    return s.toString()
   }
 
 

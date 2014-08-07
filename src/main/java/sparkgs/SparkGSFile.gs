@@ -261,6 +261,12 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
     return filter(new MetricsFilter())
   }
 
+
+  function traceWith(name : String = "Trace") : Closeable {
+    return filter(new TraceFilter(name))
+  }
+
+
   //===================================================================
   // Command line arg handling
   //===================================================================

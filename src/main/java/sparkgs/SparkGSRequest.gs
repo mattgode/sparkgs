@@ -3,9 +3,6 @@ package sparkgs
 uses java.util.*
 uses spark.*
 uses sparkgs.util.*
-uses java.lang.StringBuilder
-uses java.lang.System
-uses java.io.Closeable
 
 class SparkGSRequest implements IHasRequestLog {
 
@@ -26,14 +23,14 @@ class SparkGSRequest implements IHasRequestLog {
   var _attributes : Map<String, Object> as readonly Attributes
   var _request : Request as readonly SparkJavaRequest
   var _session : SessionMap as readonly Session
-  var _traceStack : Stack<TraceComponent>
+  var _trace : Trace as Trace
 
   construct(request:Request) {
     _request = request;
     _params = new ParamMap(SparkJavaRequest)
     _attributes = new AttributesMap(SparkJavaRequest)
     _session = new SessionMap(SparkJavaRequest)
-    _traceStack = new Stack<TraceComponent>()
+    _trace = new Trace()
   }
 
   //----------------------------------------------------------------------
@@ -142,36 +139,5 @@ class SparkGSRequest implements IHasRequestLog {
   property get QueryMap() : QueryParamsMap {
     return _request.queryMap()
   }
-
-  //----------------------------------------------------------------------
-  // Tracing Support
-  //----------------------------------------------------------------------
-
-  function popFromTrace() {
-    var popTime = System.nanoTime()
-
-
-    for (e in _traceStack) {
-      var time = (popTime - e.startTime) as double / 1000000
-      logInfo(e.name + " ["+ time + " ms]")
-    }
-  }
-
-  function pushToTrace(name : String = null) {
-    if (name == null) name = "-Section " + _traceStack.size() + ":"
-    _traceStack.push(new TraceComponent(name))
-  }
-
-
-
-  function printTrace() : String {
-    var s = new StringBuilder()
-    for (e in _traceStack index i) {
-      var time = (System.nanoTime() - e.startTime) as double / 1000000
-      s.append(e.name + " ["+time+" ms]\n")
-    }
-    return s.toString()
-  }
-
 
 }

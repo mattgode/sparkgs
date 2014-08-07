@@ -86,14 +86,18 @@ using(metering()) {
     return "${Params['bar']}"
   })
 
-  using(traceWith()) {
-    get("/trace_example", \-> {
-      Request.pushToTrace()
-      print("hello") //some other action between trace sections
-      Request.pushToTrace()
-      Request.pushToTrace()
-      return "Check out your console!"})
-  }
+  get("/trace_example", \-> {
+
+    using(traceWith("First Print")) {
+      print("hello 1")
+    }
+
+    using(traceWith("Second Print")) {
+      print("hello 2")
+    }
+
+    return "Check out your console!"
+  })
 
   // exception handling
   get("/exception", \-> { throw "Foo!" } )

@@ -39,23 +39,32 @@ class SparkGSRoute implements Route, IHasRequestContext {
 
   override function handle(r: Request, p: Response): String {
     using(MetricsRunner.time(_route, r.requestMethod())) {
-      var start = System.currentTimeMillis()
-      logInfo( \-> "Started ${Request.Method} ${Request.PathInfo}")
-      try {
-        var body = _body()
-        if (body typeis String) {
-          return Response.handleLayouts(body)
+      using(traceWith("${Request.Method} ${Request.PathInfo}")) {
+        var start = System.currentTimeMillis()
+        logInfo( \-> "Started ${Request.Method} ${Request.PathInfo}")
+        try {
+          var body : Object
+          using(traceWith("Invoking Handler")) {
+            body = _body()
+          }
+          if (body typeis String) {
+            using(traceWith("Rendering Layout")) {
+              return Response.handleLayouts(body)
+            }
+          }
+          if (body typeis RawContent) {
+            return body.toString()
+          }
+          if (body typeis Json) {
+            Response.Type ="application/json"
+            return body.toString()
+          }
+          return null
+        } finally {
+          logInfo( \-> "Finished ${Request.Method} ${Request.PathInfo} in ${System.currentTimeMillis() - start}ms")
         }
-        if (body typeis RawContent) {
-          return body.toString();
-        }
-        if (body typeis Json) {
-          Response.Type ="application/json"
-          return body.toString()
-        }
-        return null
       } finally {
-        logInfo( \-> "Finished ${Request.Method} ${Request.PathInfo} in ${System.currentTimeMillis() - start}ms")
+        logInfo(\-> "Request Trace:\n" + Request.Trace.print())
       }
     }
   }

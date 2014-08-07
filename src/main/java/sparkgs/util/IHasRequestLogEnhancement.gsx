@@ -29,13 +29,13 @@ enhancement IHasRequestLogEnhancement : IHasRequestLog {
     }
   }
 
-  function logWarn(message: String) {
+  function logWarn(message: Object) {
     if (Logger.isWarnEnabled()) {
       Logger.warn(toStr(message))
     }
   }
 
-  function logTrace(message: String) {
+  function logTrace(message: Object) {
     if (Logger.isTraceEnabled()) {
       Logger.trace(toStr(message))
     }

@@ -5,6 +5,7 @@ uses spark.Spark
 uses javax.servlet.http.HttpServletResponse
 uses java.util.Stack
 uses com.google.gson.Gson
+uses java.io.Closeable
 
 enhancement IHasRequestContextEnhancement: IHasRequestContext {
 
@@ -49,6 +50,10 @@ enhancement IHasRequestContextEnhancement: IHasRequestContext {
 
   property get Layouts() : Stack<SparkGSLayout> {
     return Response.Layouts
+  }
+
+  function traceWith(str : String) : Closeable {
+    return Request.Trace.traceWith(str)
   }
 
   property set Layout(layout : SparkGSLayout) {

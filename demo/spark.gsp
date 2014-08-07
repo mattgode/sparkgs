@@ -87,12 +87,15 @@ using(metering()) {
   })
 
   get("/trace_example", \-> {
-    Request.pushToTrace()
-    Request.pushToTrace()
-    Request.printTrace()
-  
-    Request.popFromTrace()
-    Request.printTrace()
+
+    using(traceWith("First Print")) {
+      print("hello 1")
+    }
+
+    using(traceWith("Second Print")) {
+      print("hello 2")
+    }
+
     return "Check out your console!"
   })
 

@@ -249,7 +249,6 @@ abstract class SparkGSFile implements IHasRequestContext, IManagedProgramInstanc
     }
   }
 
-
   function before(handler : block(req:SparkGSRequest , resp:SparkGSResponse), path : String = SparkUtils.ALL_PATHS, acceptType: String = null) {
     Spark.before(path, acceptType, \ r, p -> handler(Request, Response))
   }
